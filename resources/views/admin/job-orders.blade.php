@@ -45,7 +45,7 @@
                             All statuses
                         </option>
 
-                        @foreach (['pending_approval', 'needs_revision', 'approved', 'assigned', 'in_progress', 'completed'] as $s)
+                        @foreach (['pending_approval', 'approved', 'assigned'] as $s)
 
                             <option
                                 value="{{ $s }}"

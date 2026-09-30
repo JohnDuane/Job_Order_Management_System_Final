@@ -1,5 +1,5 @@
 <!-- Sidebar -->
-        <aside class="w-56 shrink-0 bg-[#d3e3f4] border-r border-gray-200 p-4 flex flex-col gap-1">
+        <aside class="w-56 shrink-0 bg-[#f8fbff] border-r border-gray-200 p-4 flex flex-col gap-1">
 
             <div class="flex items-center gap-2 px-2 pb-6 pt-1">
                 <i class="ti ti-tool text-xl text-blue-600"></i>
@@ -10,32 +10,44 @@
             <a href="{{ route('supervisor.dashboard') }}"
                class="flex items-center gap-2.5 px-3 py-2 rounded-lg
                   {{ request()->routeIs('supervisor.dashboard')
-                      ? 'bg-white shadow-sm font-medium text-gray-900'
+                      ? 'bg-[#d3e3f4] shadow-sm font-medium text-gray-900'
                       : 'text-gray-500 hover:bg-white/70' }}">
             <i class="ti ti-layout-dashboard text-base"></i>
             Dashboard
             </a>
 
             <a href="{{ route('supervisor.pending-approvals') }}"
-               class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-500 hover:bg-white/70">
+               class="flex items-center gap-2.5 px-3 py-2 rounded-lg
+                  {{ request()->routeIs('supervisor.pending-approvals')
+                      ? 'bg-[#d3e3f4] shadow-sm font-medium text-gray-900'
+                      : 'text-gray-500 hover:bg-white/70' }}">
                 <i class="ti ti-clock text-base"></i>
                 Pending approvals
             </a>
 
             <a href="{{ route('supervisor.AJO') }}"
-               class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-500 hover:bg-white/70">
+               class="flex items-center gap-2.5 px-3 py-2 rounded-lg 
+                  {{ request()->routeIs('supervisor.AJO')
+                      ? 'bg-[#d3e3f4] shadow-sm font-medium text-gray-900'
+                      : 'text-gray-500 hover:bg-white/70' }}">
                 <i class="ti ti-clipboard-list text-base"></i>
                 All job orders
             </a>
 
             <a href="{{ route('supervisor.assign-mechanic') }}"
-               class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-500 hover:bg-white/70">
+               class="flex items-center gap-2.5 px-3 py-2 rounded-lg 
+                  {{ request()->routeIs('supervisor.assign-mechanic')
+                      ? 'bg-[#d3e3f4] shadow-sm font-medium text-gray-900'
+                      : 'text-gray-500 hover:bg-white/70' }}">
                 <i class="ti ti-user-check text-base"></i>
                 Assign mechanic
             </a>
 
             <a href="{{ route('supervisor.approval-history') }}"
-               class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-500 hover:bg-white/70">
+               class="flex items-center gap-2.5 px-3 py-2 rounded-lg 
+                  {{ request()->routeIs('supervisor.approval-history')
+                      ? 'bg-[#d3e3f4] shadow-sm font-medium text-gray-900'
+                      : 'text-gray-500 hover:bg-white/70' }}">
                 <i class="ti ti-history text-base"></i>
                 Approval history
             </a>

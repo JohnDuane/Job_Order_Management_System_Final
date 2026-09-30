@@ -1,4 +1,4 @@
-<aside class="w-56 shrink-0 bg-[#f5d1d1] border-r border-gray-200 p-4 flex flex-col">
+<aside class="w-56 shrink-0 bg-[#fff9f9] border-r border-gray-200 p-4 flex flex-col">
 
     <!-- Logo -->
     <div class="flex items-center gap-2 px-2 pb-6 pt-1">
@@ -12,7 +12,7 @@
         <a href="{{ route('admin.dashboard') }}"
            class="flex items-center gap-2.5 px-3 py-2 rounded-lg
                   {{ request()->routeIs('admin.dashboard')
-                      ? 'bg-white shadow-sm font-medium text-gray-900'
+                      ? 'bg-[#f5d1d1] shadow-sm font-medium text-gray-900'
                       : 'text-gray-500 hover:bg-white/70' }}">
             <i class="ti ti-layout-dashboard text-base"></i>
             Dashboard
@@ -21,7 +21,7 @@
         <a href="{{ route('admin.customers') }}"
            class="flex items-center gap-2.5 px-3 py-2 rounded-lg
                   {{ request()->routeIs('admin.customers')
-                      ? 'bg-white shadow-sm font-medium text-gray-900'
+                      ? 'bg-[#f5d1d1] shadow-sm font-medium text-gray-900'
                       : 'text-gray-500 hover:bg-white/70' }}">
             <i class="ti ti-users text-base"></i>
             Customers
@@ -30,7 +30,7 @@
         <a href="{{ route('admin.vehicles') }}"
            class="flex items-center gap-2.5 px-3 py-2 rounded-lg
                   {{ request()->routeIs('admin.vehicles')
-                      ? 'bg-white shadow-sm font-medium text-gray-900'
+                      ? 'bg-[#f5d1d1] shadow-sm font-medium text-gray-900'
                       : 'text-gray-500 hover:bg-white/70' }}">
             <i class="ti ti-car text-base"></i>
             Vehicles
@@ -39,7 +39,7 @@
         <a href="{{ route('admin.staff') }}"
            class="flex items-center gap-2.5 px-3 py-2 rounded-lg
                   {{ request()->routeIs('admin.staff')
-                      ? 'bg-white shadow-sm font-medium text-gray-900'
+                      ? 'bg-[#f5d1d1] shadow-sm font-medium text-gray-900'
                       : 'text-gray-500 hover:bg-white/70' }}">
             <i class="ti ti-user-check text-base"></i>
             Staff
@@ -48,7 +48,7 @@
         <a href="{{ route('admin.job-orders') }}"
            class="flex items-center gap-2.5 px-3 py-2 rounded-lg
                   {{ request()->routeIs('admin.job-orders')
-                      ? 'bg-white shadow-sm font-medium text-gray-900'
+                      ? 'bg-[#f5d1d1] shadow-sm font-medium text-gray-900'
                       : 'text-gray-500 hover:bg-white/70' }}">
             <i class="ti ti-clipboard-list text-base"></i>
             Job orders
@@ -57,7 +57,7 @@
         <a href="{{ route('admin.services') }}"
            class="flex items-center gap-2.5 px-3 py-2 rounded-lg
                   {{ request()->routeIs('admin.services')
-                      ? 'bg-white shadow-sm font-medium text-gray-900'
+                      ? 'bg-[#f5d1d1] shadow-sm font-medium text-gray-900'
                       : 'text-gray-500 hover:bg-white/70' }}">
             <i class="ti ti-settings text-base"></i>
             Services
@@ -71,7 +71,7 @@
 
         <button
             @click="open = !open"
-            class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left hover:bg-gray-100"
+            class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left hover:bg-[#f5d1d1]"
         >
 
             <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200">

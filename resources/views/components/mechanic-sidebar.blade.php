@@ -1,5 +1,5 @@
  <!-- Sidebar -->
-        <aside class="w-56 shrink-0 bg-[#DDF6D2] border-r border-gray-200 p-4 flex flex-col gap-1">
+        <aside class="w-56 shrink-0 bg-[#fbfff9] border-r border-gray-200 p-4 flex flex-col gap-1">
 
             <!-- Logo -->
             <div class="flex items-center gap-2 px-2 pb-6 pt-1">
@@ -10,7 +10,10 @@
 
             <!-- Navigation -->
             <a href="{{ route('mechanic.dashboard') }}"
-               class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-white shadow-sm font-medium text-sm text-gray-900">
+               class="flex items-center gap-2.5 px-3 py-2 rounded-lg 
+                  {{ request()->routeIs('mechanic.dashboard')
+                      ? 'bg-[#d3f4d3] shadow-sm font-medium text-gray-900'
+                      : 'text-gray-500 hover:bg-white/70' }}">
 
                 <i class="ti ti-layout-dashboard text-base"></i>
                 Dashboard
@@ -19,7 +22,10 @@
 
 
             <a href="{{ route('mechanic.MJO') }}"
-               class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-500 hover:bg-white/70">
+               class="flex items-center gap-2.5 px-3 py-2 rounded-lg 
+                  {{ request()->routeIs('mechanic.MJO')
+                      ? 'bg-[#d3f4d3] shadow-sm font-medium text-gray-900'
+                      : 'text-gray-500 hover:bg-white/70' }}">
 
                 <i class="ti ti-clipboard-list text-base"></i>
                 My job orders
@@ -28,7 +34,10 @@
 
 
             <a href="{{ route('mechanic.CJO') }}"
-               class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-500 hover:bg-white/70">
+               class="flex items-center gap-2.5 px-3 py-2 rounded-lg 
+                  {{ request()->routeIs('mechanic.CJO')
+                      ? 'bg-[#d3f4d3] shadow-sm font-medium text-gray-900'
+                      : 'text-gray-500 hover:bg-white/70' }}">
 
                 <i class="ti ti-file-plus text-base"></i>
                 Create job order
@@ -37,7 +46,10 @@
 
 
             <a href="{{ route('mechanic.needs-revision') }}"
-               class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-500 hover:bg-white/70">
+               class="flex items-center gap-2.5 px-3 py-2 rounded-lg 
+                  {{ request()->routeIs('mechanic.needs-revision')
+                      ? 'bg-[#d3f4d3] shadow-sm font-medium text-gray-900'
+                      : 'text-gray-500 hover:bg-white/70' }}">
 
                 <i class="ti ti-alert-triangle text-base"></i>
                 Needs revision

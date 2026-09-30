@@ -33,17 +33,35 @@
                             @forelse($jobs as $job)
                                 <tr class="border-b last:border-0">
                                     <td class="p-4 font-medium">{{ $job->code }}</td>
-                                    <td class="p-4">{{ $job->customer->first_name }} {{ $job->customer->last_name }}
+                                    <td class="p-4">
+                                        {{ $job->customer->first_name }} {{ $job->customer->last_name }}
                                     </td>
-                                    <td class="p-4">{{ $job->vehicle->make }}<div class="text-xs text-gray-400">
-                                            {{ $job->vehicle->plate_number }}</div>
+                                    <td class="p-4">
+                                        {{ $job->vehicle->make }}
+                                        <div class="text-xs text-gray-400">
+                                            {{ $job->vehicle->plate_number }}
+                                        </div>
                                     </td>
                                     <td class="p-4">
                                         {{ $job->assignments->map(fn($a) => $a->staff?->user?->name)->filter()->join(', ') ?: '—' }}
                                     </td>
-                                    <td class="p-4">{{ $job->date_issued->format('M d, Y') }}</td>
-                                    <td class="p-4"><span
-                                            class="rounded-md bg-gray-100 px-2 py-1 text-xs">{{ str_replace('_', ' ', ucwords($job->status)) }}</span>
+                                    <td class="p-4">
+                                        {{ $job->date_issued->format('M d, Y') }}
+                                    </td>
+                                    <td class="p-4">
+                                        @php
+                                            $statusClasses = match ($job->status) {
+                                                'pending_approval' => 'bg-yellow-50 text-yellow-700',
+                                                'needs_revision' => 'bg-red-50 text-red-700',
+                                                'approved' => 'bg-green-50 text-green-700',
+                                                'assigned' => 'bg-blue-50 text-blue-700',
+                                                default => 'bg-gray-50 text-gray-700',
+                                            };
+                                        @endphp
+
+                                        <span class="rounded-md {{ $statusClasses }} px-2 py-1 text-xs">
+                                            {{ str_replace('_', ' ', ucwords($job->status)) }}
+                                        </span>
                                     </td>
                             </tr>@empty<tr>
                                     <td colspan="6" class="p-10 text-center text-gray-500">No job orders found.</td>
