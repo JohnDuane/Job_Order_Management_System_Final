@@ -1,4 +1,8 @@
-@if (session('success') || session('error') || $errors->any())
+@if (
+    (session('success') && !session('customer_id'))
+    || session('error')
+    || $errors->any()
+)
     <div x-data="{ open: true }" x-show="open" x-cloak
         class="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 p-4"
         @keydown.escape.window="open=false">
