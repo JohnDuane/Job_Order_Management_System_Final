@@ -246,7 +246,13 @@ class JobOrderController extends Controller
     public function mechanicOrders(Request $request): View
     {
         $staff = Staff::where('user_id', auth()->id())->firstOrFail();
-        $query = JobOrder::with(['customer', 'vehicle', 'services', 'assignments.staff.user'])
+        $query = JobOrder::with([
+            'customer',
+            'vehicle',
+            'services',
+            'assignments.staff.user',
+            'approvals.approvedBy'
+        ])
             ->whereHas('assignments', fn ($q) => $q->where('staff_id', $staff->staff_id))
             ->latest('job_order_id');
         $this->applyFilters($query, $request);
