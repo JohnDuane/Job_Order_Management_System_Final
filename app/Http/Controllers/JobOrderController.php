@@ -268,100 +268,7 @@ class JobOrderController extends Controller
     {
         $base = JobOrder::query();
 
-        /*
-        |--------------------------------------------------------------------------
-        | Mechanic-specific dashboard filtering
-        |--------------------------------------------------------------------------
-        */
-        if (auth()->user()->isMechanic()) {
-
-            $staff = Staff::where('user_id', auth()->id())->first();
-
-            $base->when($staff, function ($q) use ($staff) {
-                $q->whereHas('assignments', function ($assignment) use ($staff) {
-                    $assignment->where('staff_id', $staff->staff_id);
-                });
-            });
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Current week job activity
-        |--------------------------------------------------------------------------
-        |
-        | Creates one value for each day of the current week.
-        | If there are no jobs on a particular day, it returns 0.
-        |
-        */
-
-        $weekStart = now()->startOfWeek();
-        $weekEnd = now()->endOfWeek();
-
-        $weeklyJobs = (clone $base)
-            ->whereBetween('date_issued', [
-                $weekStart->toDateString(),
-                $weekEnd->toDateString(),
-            ])
-            ->get()
-            ->groupBy(function ($job) {
-                return $job->date_issued->format('Y-m-d');
-            });
-
-
-        $jobActivityLabels = [];
-        $jobActivityData = [];
-
-        for ($date = $weekStart->copy(); $date->lte($weekEnd); $date->addDay()) {
-
-            $dateKey = $date->format('Y-m-d');
-
-            $jobActivityLabels[] = $date->format('D');
-
-            $jobActivityData[] = $weeklyJobs->get($dateKey, collect())->count();
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Job status chart
-        |--------------------------------------------------------------------------
-        */
-
-        $jobStatusData = [
-            'pending_approval' => (clone $base)
-                ->where('status', 'pending_approval')
-                ->count(),
-
-            'approved' => (clone $base)
-                ->where('status', 'approved')
-                ->count(),
-
-            'assigned' => (clone $base)
-                ->where('status', 'assigned')
-                ->count(),
-
-            'in_progress' => (clone $base)
-                ->where('status', 'in_progress')
-                ->count(),
-
-            'completed' => (clone $base)
-                ->where('status', 'completed')
-                ->count(),
-
-            'needs_revision' => (clone $base)
-                ->where('status', 'needs_revision')
-                ->count(),
-        ];
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Dashboard
-        |--------------------------------------------------------------------------
-        */
-
-        return view(auth()->user()->role . '.dashboard', [
+        return view('admin.dashboard', [
 
             'customerCount' => Customer::count(),
 
@@ -403,17 +310,34 @@ class JobOrderController extends Controller
                 ->limit(8)
                 ->get(),
 
-            /*
-            |--------------------------------------------------------------------------
-            | Chart data
-            |--------------------------------------------------------------------------
-            */
+            'jobActivityLabels' => collect(range(0, 6))
+                ->map(function ($day) {
+                    return now()->startOfWeek()->addDays($day)->format('D');
+                })
+                ->toArray(),
 
-            'jobActivityLabels' => $jobActivityLabels,
+            'jobActivityData' => collect(range(0, 6))
+                ->map(function ($day) use ($base) {
 
-            'jobActivityData' => $jobActivityData,
+                    $date = now()
+                        ->startOfWeek()
+                        ->addDays($day)
+                        ->toDateString();
 
-            'jobStatusData' => $jobStatusData,
+                    return (clone $base)
+                        ->whereDate('date_issued', $date)
+                        ->count();
+                })
+                ->toArray(),
+
+            'jobStatusData' => [
+                'pending_approval' => 0,
+                'approved' => 0,
+                'assigned' => 0,
+                'in_progress' => 0,
+                'completed' => 0,
+                'needs_revision' => 0,
+            ],
         ]);
     }
 
