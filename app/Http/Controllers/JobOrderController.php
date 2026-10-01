@@ -137,7 +137,7 @@ class JobOrderController extends Controller
     {
         $query = JobOrder::with(['customer', 'vehicle', 'services', 'assignments.staff.user', 'creator'])->latest('job_order_id');
         $this->applyFilters($query, $request);
-        $jobs = $query->paginate(20)->withQueryString();
+        $jobs = $query->paginate(5)->withQueryString();
         return view('admin.job-orders', compact('jobs'));
     }
 
@@ -145,7 +145,7 @@ class JobOrderController extends Controller
     {
         $query = JobOrder::with(['customer', 'vehicle', 'services', 'assignments.staff.user', 'creator'])->latest('job_order_id');
         $this->applyFilters($query, $request);
-        $jobs = $query->paginate(20)->withQueryString();
+        $jobs = $query->paginate(5)->withQueryString();
         return view('supervisor.AJO', compact('jobs'));
     }
 
@@ -155,14 +155,14 @@ class JobOrderController extends Controller
             ->where('status', 'pending_approval')
             ->latest('job_order_id');
         $this->applyFilters($query, $request);
-        $jobs = $query->paginate(20)->withQueryString();
+        $jobs = $query->paginate(5)->withQueryString();
         return view('supervisor.pending-approvals', compact('jobs'));
     }
 
     public function approvalHistory(Request $request): View
     {
         $approvals = JobOrderApproval::with(['jobOrder.customer', 'jobOrder.vehicle', 'approvedBy'])
-            ->latest('id')->paginate(20)->withQueryString();
+            ->latest('id')->paginate(5)->withQueryString();
         return view('supervisor.approval-history', compact('approvals'));
     }
 
@@ -210,7 +210,7 @@ class JobOrderController extends Controller
     {
         $jobs = JobOrder::with(['customer', 'vehicle', 'services', 'assignments.staff.user'])
             ->whereIn('status', ['approved', 'assigned', 'in_progress'])
-            ->latest('job_order_id')->paginate(20)->withQueryString();
+            ->latest('job_order_id')->paginate(5)->withQueryString();
         $mechanics = Staff::with('user')->whereHas('user', fn ($q) => $q->where('role', 'mechanic'))->orderBy('staff_last')->get();
         return view('supervisor.assign-mechanic', compact('jobs', 'mechanics'));
     }
@@ -256,7 +256,7 @@ class JobOrderController extends Controller
             ->whereHas('assignments', fn ($q) => $q->where('staff_id', $staff->staff_id))
             ->latest('job_order_id');
         $this->applyFilters($query, $request);
-        $jobs = $query->paginate(20)->withQueryString();
+        $jobs = $query->paginate(5)->withQueryString();
         return view('mechanic.MJO', compact('jobs'));
     }
 

@@ -11,19 +11,20 @@ use Illuminate\View\View;
 
 class CustomerController extends Controller
 {
-
+    /**
+     * Display customers.
+     */
     public function index(): View
     {
         $customers = Customer::with('vehicles')
             ->orderBy('last_name')
             ->orderBy('first_name')
-            ->get();
+            ->paginate(5);
 
         return view('admin.customers', [
             'customers' => $customers,
         ]);
     }
-
 
     /**
      * Show the add customer form.
@@ -97,7 +98,6 @@ class CustomerController extends Controller
             ->with('success', 'Customer updated successfully.');
     }
 
-
     /**
      * Delete an existing customer.
      */
@@ -106,7 +106,12 @@ class CustomerController extends Controller
         try {
             $customer->delete();
         } catch (QueryException $e) {
-            return redirect()->route('admin.customers')->with('error', 'Customer cannot be deleted because vehicles or job orders are linked to this record.');
+            return redirect()
+                ->route('admin.customers')
+                ->with(
+                    'error',
+                    'Customer cannot be deleted because vehicles or job orders are linked to this record.'
+                );
         }
 
         return redirect()

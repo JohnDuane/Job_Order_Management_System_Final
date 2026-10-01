@@ -208,13 +208,13 @@
                 {{-- Customer Table --}}
                 <div
                     class="overflow-hidden rounded-xl border
-                           border-gray-200 bg-white"
+                        border-gray-200 bg-white"
                 >
 
                     {{-- Table Header --}}
                     <div
                         class="flex items-center justify-between
-                               border-b border-gray-100 px-5 py-4"
+                            border-b border-gray-100 px-5 py-4"
                     >
 
                         <div>
@@ -224,15 +224,16 @@
                             </p>
 
                             <p class="mt-1 text-xs text-gray-500">
+                                Showing
+                                <span>{{ $customers->firstItem() ?? 0 }}</span>
+                                –
+                                <span>{{ $customers->lastItem() ?? 0 }}</span>
+                                of
+                                <span>{{ $customers->total() }}</span>
 
-                                <span x-text="filteredCustomers.length"></span>
-
-                                <span
-                                    x-text="filteredCustomers.length === 1
-                                        ? 'customer'
-                                        : 'customers'"
-                                ></span>
-
+                                <span>
+                                    {{ $customers->total() === 1 ? 'customer' : 'customers' }}
+                                </span>
                             </p>
 
                         </div>
@@ -251,7 +252,7 @@
 
                             <span
                                 class="rounded-md bg-gray-100 px-2 py-1
-                                       font-medium text-gray-700"
+                                    font-medium text-gray-700"
                                 x-text="`'${search}'`"
                             ></span>
 
@@ -269,40 +270,40 @@
 
                                 <tr
                                     class="border-b border-gray-100
-                                           text-left text-gray-500"
+                                        text-left text-gray-500"
                                 >
 
                                     <th
                                         class="whitespace-nowrap px-5 py-3
-                                               font-normal"
+                                            font-normal"
                                     >
                                         Customer
                                     </th>
 
                                     <th
                                         class="whitespace-nowrap px-5 py-3
-                                               font-normal"
+                                            font-normal"
                                     >
                                         Contact
                                     </th>
 
                                     <th
                                         class="whitespace-nowrap px-5 py-3
-                                               font-normal"
+                                            font-normal"
                                     >
                                         Vehicles
                                     </th>
 
                                     <th
                                         class="whitespace-nowrap px-5 py-3
-                                               font-normal"
+                                            font-normal"
                                     >
                                         Address
                                     </th>
 
                                     <th
                                         class="whitespace-nowrap px-5 py-3
-                                               text-right font-normal"
+                                            text-right font-normal"
                                     >
                                         Action
                                     </th>
@@ -314,29 +315,29 @@
 
                             <tbody>
 
-                                {{-- Customers --}}
-                                <template
-                                    x-for="customer in filteredCustomers"
-                                    :key="customer.cust_id"
-                                >
+                                @forelse ($customers as $customer)
 
                                     <tr
                                         class="border-b border-gray-100
-                                               transition hover:bg-gray-50"
+                                            transition hover:bg-gray-50"
                                     >
 
                                         {{-- Customer --}}
                                         <td class="px-5 py-3">
 
-                                            <p
-                                                class="font-medium text-gray-900"
-                                                x-text="customer.full_name"
-                                            ></p>
+                                            <p class="font-medium text-gray-900">
+                                                {{ trim(
+                                                    $customer->first_name . ' ' .
+                                                    ($customer->middle_name
+                                                        ? $customer->middle_name . ' '
+                                                        : '') .
+                                                    $customer->last_name
+                                                ) }}
+                                            </p>
 
-                                            <p
-                                                class="text-xs text-gray-500"
-                                                x-text="`Customer #${String(customer.cust_id).padStart(3, '0')}`"
-                                            ></p>
+                                            <p class="text-xs text-gray-500">
+                                                Customer #{{ str_pad($customer->cust_id, 3, '0', STR_PAD_LEFT) }}
+                                            </p>
 
                                         </td>
 
@@ -344,26 +345,24 @@
                                         {{-- Contact --}}
                                         <td
                                             class="whitespace-nowrap px-5 py-3
-                                                   text-gray-600"
-                                            x-text="customer.contact_number"
-                                        ></td>
+                                                text-gray-600"
+                                        >
+                                            {{ $customer->contact_number }}
+                                        </td>
 
 
                                         {{-- Vehicles --}}
                                         <td
                                             class="whitespace-nowrap px-5 py-3
-                                                   text-gray-600"
+                                                text-gray-600"
                                         >
 
-                                            <span
-                                                x-text="customer.vehicle_count"
-                                            ></span>
+                                            {{ $customer->vehicles->count() }}
 
-                                            <span
-                                                x-text="customer.vehicle_count === 1
-                                                    ? ' vehicle'
-                                                    : ' vehicles'"
-                                            ></span>
+                                            {{ $customer->vehicles->count() === 1
+                                                ? 'vehicle'
+                                                : 'vehicles'
+                                            }}
 
                                         </td>
 
@@ -371,14 +370,15 @@
                                         {{-- Address --}}
                                         <td
                                             class="max-w-xs px-5 py-3
-                                                   text-gray-600"
+                                                text-gray-600"
                                         >
 
                                             <p
                                                 class="truncate"
-                                                :title="customer.address"
-                                                x-text="customer.address"
-                                            ></p>
+                                                title="{{ $customer->address }}"
+                                            >
+                                                {{ $customer->address }}
+                                            </p>
 
                                         </td>
 
@@ -388,31 +388,54 @@
 
                                             <div
                                                 class="flex items-center
-                                                       justify-end gap-2"
+                                                    justify-end gap-2"
                                             >
 
                                                 {{-- Edit --}}
                                                 <button
                                                     type="button"
-                                                    @click="openEditModal(customer)"
-                                                    class="inline-flex items-center gap-1.5 rounded-lg
-                                                        border border-gray-200 px-2.5 py-1.5
-                                                        text-xs font-medium text-gray-600
-                                                        transition hover:bg-gray-50 hover:text-gray-900"
+                                                    @click="openEditModal({
+                                                        cust_id: {{ $customer->cust_id }},
+                                                        first_name: @js($customer->first_name),
+                                                        middle_name: @js($customer->middle_name ?? ''),
+                                                        last_name: @js($customer->last_name),
+                                                        contact_number: @js($customer->contact_number),
+                                                        address: @js($customer->address)
+                                                    })"
+                                                    class="inline-flex items-center gap-1.5
+                                                        rounded-lg border border-gray-200
+                                                        px-2.5 py-1.5 text-xs font-medium
+                                                        text-gray-600 transition
+                                                        hover:bg-gray-50 hover:text-gray-900"
                                                 >
+
                                                     <i class="ti ti-edit text-sm"></i>
+
                                                     Edit
+
                                                 </button>
 
 
                                                 {{-- Delete --}}
                                                 <button
                                                     type="button"
-                                                    @click="openDeleteModal(customer)"
-                                                    class="inline-flex items-center gap-1.5 rounded-lg
-                                                        border border-gray-200 px-2.5 py-1.5
-                                                        text-xs font-medium text-red-600
-                                                        transition hover:bg-red-50 hover:border-red-200"
+                                                    @click="openDeleteModal({
+                                                        cust_id: {{ $customer->cust_id }},
+                                                        full_name: @js(
+                                                            trim(
+                                                                $customer->first_name . ' ' .
+                                                                ($customer->middle_name
+                                                                    ? $customer->middle_name . ' '
+                                                                    : '') .
+                                                                $customer->last_name
+                                                            )
+                                                        )
+                                                    })"
+                                                    class="inline-flex items-center gap-1.5
+                                                        rounded-lg border border-gray-200
+                                                        px-2.5 py-1.5 text-xs font-medium
+                                                        text-red-600 transition
+                                                        hover:border-red-200 hover:bg-red-50"
                                                 >
                                                     <i class="ti ti-trash text-sm"></i>
                                                     Delete
@@ -424,75 +447,66 @@
 
                                     </tr>
 
-                                </template>
+                                @empty
 
+                                    <tr>
 
-                                {{-- No Search Results --}}
-                                <tr
-                                    x-show="filteredCustomers.length === 0"
-                                >
-
-                                    <td
-                                        colspan="5"
-                                        class="px-5 py-14 text-center"
-                                    >
-
-                                        <div
-                                            class="flex flex-col items-center"
+                                        <td
+                                            colspan="5"
+                                            class="px-5 py-14 text-center"
                                         >
 
                                             <div
-                                                class="flex h-12 w-12
-                                                       items-center justify-center
-                                                       rounded-full bg-gray-100"
+                                                class="flex flex-col items-center"
                                             >
 
-                                                <i
-                                                    class="ti ti-search
-                                                           text-xl text-gray-400"
-                                                ></i>
+                                                <div
+                                                    class="flex h-12 w-12
+                                                        items-center justify-center
+                                                        rounded-full bg-gray-100"
+                                                >
+
+                                                    <i
+                                                        class="ti ti-users
+                                                            text-xl text-gray-400"
+                                                    ></i>
+
+                                                </div>
+
+
+                                                <p
+                                                    class="mt-3 text-sm
+                                                        font-medium text-gray-800"
+                                                >
+                                                    No customers found
+                                                </p>
+
+
+                                                <p
+                                                    class="mt-1 max-w-sm text-xs
+                                                        text-gray-500"
+                                                >
+                                                    There are currently no customer records.
+                                                </p>
 
                                             </div>
 
+                                        </td>
 
-                                            <p
-                                                class="mt-3 text-sm
-                                                       font-medium text-gray-800"
-                                            >
-                                                No customers found
-                                            </p>
+                                    </tr>
 
-
-                                            <p
-                                                class="mt-1 max-w-sm text-xs
-                                                       text-gray-500"
-                                            >
-                                                Try searching with a different
-                                                name, contact number, or address.
-                                            </p>
-
-
-                                            <button
-                                                type="button"
-                                                @click="search = ''"
-                                                class="mt-4 text-xs font-medium
-                                                       text-gray-700 underline
-                                                       underline-offset-2
-                                                       hover:text-gray-900"
-                                            >
-                                                Clear search
-                                            </button>
-
-                                        </div>
-
-                                    </td>
-
-                                </tr>
+                                @endforelse
 
                             </tbody>
 
                         </table>
 
+                    </div>
+
+
+                    {{-- Pagination --}}
+                    <div class="mt-5">
+                        {{ $customers->links() }}
                     </div>
 
                 </div>
@@ -856,122 +870,68 @@
 
 
     {{-- Alpine Customer Table --}}
-   <script>
-    function customerTable() {
-        return {
-            search: '',
-            sort: 'az',
-            open: false,
+    <script>
+        function customerTable() {
+            return {
+                search: '',
+                sort: 'az',
 
-            editModal: false,
-            deleteModal: false,
+                editModal: false,
+                deleteModal: false,
 
-            editCustomer: {
-                id: null,
-                first_name: '',
-                middle_name: '',
-                last_name: '',
-                contact_number: '',
-                address: ''
-            },
+                editCustomer: {
+                    id: null,
+                    first_name: '',
+                    middle_name: '',
+                    last_name: '',
+                    contact_number: '',
+                    address: ''
+                },
 
-            deleteCustomer: {
-                id: null,
-                name: ''
-            },
+                deleteCustomer: {
+                    id: null,
+                    name: ''
+                },
 
-            customers: @js(
-                $customers->map(function ($customer) {
-                    return [
-                        'cust_id' => $customer->cust_id,
-                        'first_name' => $customer->first_name,
-                        'middle_name' => $customer->middle_name ?? '',
-                        'last_name' => $customer->last_name,
-                        'contact_number' => $customer->contact_number,
-                        'address' => $customer->address,
-                        'vehicle_count' => $customer->vehicles->count(),
-                        'full_name' => trim(
-                            $customer->first_name . ' ' .
-                            ($customer->middle_name
-                                ? $customer->middle_name . ' '
-                                : '') .
-                            $customer->last_name
-                        ),
-                    ];
-                })->values()
-            ),
+                openEditModal(customer) {
+                    this.editCustomer = {
+                        id: customer.cust_id,
+                        first_name: customer.first_name || '',
+                        middle_name: customer.middle_name || '',
+                        last_name: customer.last_name || '',
+                        contact_number: customer.contact_number || '',
+                        address: customer.address || ''
+                    };
 
-            get filteredCustomers() {
-                let results = [...this.customers];
+                    this.editModal = true;
 
-                const search = this.search.toLowerCase().trim();
+                    document.body.classList.add('overflow-hidden');
+                },
 
-                // Search
-                if (search) {
-                    results = results.filter(customer => {
-                        return (
-                            customer.full_name.toLowerCase().includes(search) ||
-                            customer.contact_number.toLowerCase().includes(search) ||
-                            customer.address.toLowerCase().includes(search)
-                        );
-                    });
+                closeEditModal() {
+                    this.editModal = false;
+
+                    document.body.classList.remove('overflow-hidden');
+                },
+
+                openDeleteModal(customer) {
+                    this.deleteCustomer = {
+                        id: customer.cust_id,
+                        name: customer.full_name
+                    };
+
+                    this.deleteModal = true;
+
+                    document.body.classList.add('overflow-hidden');
+                },
+
+                closeDeleteModal() {
+                    this.deleteModal = false;
+
+                    document.body.classList.remove('overflow-hidden');
                 }
-
-                // Sort
-                results.sort((a, b) => {
-                    const nameA = a.full_name.toLowerCase();
-                    const nameB = b.full_name.toLowerCase();
-
-                    if (this.sort === 'za') {
-                        return nameB.localeCompare(nameA);
-                    }
-
-                    return nameA.localeCompare(nameB);
-                });
-
-                return results;
-            },
-
-            openEditModal(customer) {
-                this.editCustomer = {
-                    id: customer.cust_id,
-                    first_name: customer.first_name || '',
-                    middle_name: customer.middle_name || '',
-                    last_name: customer.last_name || '',
-                    contact_number: customer.contact_number || '',
-                    address: customer.address || ''
-                };
-
-                this.editModal = true;
-                document.body.classList.add('overflow-hidden');
-            },
-
-            closeEditModal() {
-                this.editModal = false;
-                document.body.classList.remove('overflow-hidden');
-            },
-
-            openDeleteModal(customer) {
-                this.deleteCustomer = {
-                    id: customer.cust_id,
-                    name: customer.full_name
-                };
-
-                this.deleteModal = true;
-                document.body.classList.add('overflow-hidden');
-            },
-
-            closeDeleteModal() {
-                this.deleteModal = false;
-                document.body.classList.remove('overflow-hidden');
-            },
-
-            reset() {
-                this.search = '';
-                this.sort = 'az';
             }
         }
-    }
-</script>
+    </script>
 
 </x-app-layout>
