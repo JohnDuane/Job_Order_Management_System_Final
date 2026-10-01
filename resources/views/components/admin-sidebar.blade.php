@@ -1,9 +1,12 @@
 <aside class="w-56 shrink-0 bg-[#fff9f9] border-r border-gray-200 p-4 flex flex-col">
 
     <!-- Logo -->
-    <div class="flex items-center gap-2 px-2 pb-6 pt-1">
-        <i class="ti ti-tool text-xl text-blue-600"></i>
-        <span class="font-medium text-[15px]">JOMS</span>
+    <div class="flex items-center justify-center px-2 pb-6 pt-1">
+        <img
+            src="{{ asset('images/logobsa.png') }}"
+            alt="BSA Auto Repair Shop"
+            class="h-13 w-auto object-contain"
+        >
     </div>
 
     <!-- Navigation -->

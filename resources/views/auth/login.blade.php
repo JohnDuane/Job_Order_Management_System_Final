@@ -36,12 +36,17 @@
             {{-- ================================================= --}}
 
             <div class="mb-8 text-center">
-
+                <!-- Increased wrapper width/height from w-13 h-13 to w-20 h-20 -->
                 <div
-                    class="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gray-900"
+                class="mx-auto flex h-20 w-20 items-center justify-center rounded-xl bg-white"
+            >
+                <!-- Increased image height from h-12 to h-18 -->
+                <img
+                    src="{{ asset('images/logobsa.png') }}"
+                    alt="BSA Auto Repair Shop"
+                    class="h-18 w-auto object-contain"
                 >
-                    <i class="ti ti-tool text-2xl text-white"></i>
-                </div>
+            </div>
 
                 <h1 class="mt-4 text-xl font-medium text-gray-900">
                     BSA Auto Repair Shop
@@ -50,8 +55,8 @@
                 <p class="mt-1 text-sm text-gray-500">
                     Job Order Management System
                 </p>
-
             </div>
+
 
 
             {{-- ================================================= --}}
