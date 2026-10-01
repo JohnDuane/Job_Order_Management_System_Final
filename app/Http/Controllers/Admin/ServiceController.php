@@ -34,28 +34,30 @@ class ServiceController extends Controller
 
 
     /**
-     * Store a new service.
-     */
-    public function store(Request $request): RedirectResponse
-    {
-        $validated = $request->validate([
-            'name' => [
-                'required',
-                'string',
-                'max:255',
-            ],
+ * Store a new service.
+ */
+public function store(Request $request): RedirectResponse
+{
+    $validated = $request->validate([
+        'name' => [
+            'required',
+            'string',
+            'max:255',
+        ],
 
-            'description' => [
-                'nullable',
-                'string',
-            ],
+        'description' => [
+            'nullable',
+            'string',
+        ],
 
-            'price' => [
-                'required',
-                'numeric',
-                'min:0',
-            ],
-        ]);
+        'price' => [
+            'required',
+            'numeric',
+            'min:0',
+        ],
+    ]);
+
+    try {
 
         Service::create([
             'service_name' => $validated['name'],
@@ -63,34 +65,44 @@ class ServiceController extends Controller
             'price' => $validated['price'],
         ]);
 
-        return redirect()
-            ->route('admin.services')
-            ->with('success', 'Service added successfully.');
+    } catch (QueryException $e) {
+
+        return back()
+            ->withInput()
+            ->with('error', 'The price is too large or invalid for the service price field.');
     }
 
-    /**
-     * Update an existing service.
-     */
-    public function update(Request $request, Service $service): RedirectResponse
-    {
-        $validated = $request->validate([
-            'name' => [
-                'required',
-                'string',
-                'max:255',
-            ],
+    return redirect()
+        ->route('admin.services')
+        ->with('success', 'Service added successfully.');
+}
 
-            'description' => [
-                'nullable',
-                'string',
-            ],
 
-            'price' => [
-                'required',
-                'numeric',
-                'min:0',
-            ],
-        ]);
+/**
+ * Update an existing service.
+ */
+public function update(Request $request, Service $service): RedirectResponse
+{
+    $validated = $request->validate([
+        'name' => [
+            'required',
+            'string',
+            'max:255',
+        ],
+
+        'description' => [
+            'nullable',
+            'string',
+        ],
+
+        'price' => [
+            'required',
+            'numeric',
+            'min:0',
+        ],
+    ]);
+
+    try {
 
         $service->update([
             'service_name' => $validated['name'],
@@ -98,10 +110,17 @@ class ServiceController extends Controller
             'price' => $validated['price'],
         ]);
 
-        return redirect()
-            ->route('admin.services')
-            ->with('success', 'Service updated successfully.');
+    } catch (QueryException $e) {
+
+        return back()
+            ->withInput()
+            ->with('error', 'The price is too large or invalid for the service price field.');
     }
+
+    return redirect()
+        ->route('admin.services')
+        ->with('success', 'Service updated successfully.');
+}
 
 
     /**

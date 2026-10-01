@@ -147,7 +147,36 @@
 
                                     <td class="p-4">
 
-                                        <span class="rounded-md bg-gray-100 px-2 py-1 text-xs">
+                                        @php
+                                            $statusStyles = [
+                                                'pending_approval' => 'bg-yellow-100 text-yellow-700 ring-1 ring-inset ring-yellow-200',
+                                                'approved'         => 'bg-blue-100 text-blue-700 ring-1 ring-inset ring-blue-200',
+                                                'assigned'         => 'bg-purple-100 text-purple-700 ring-1 ring-inset ring-purple-200',
+                                                'in_progress'      => 'bg-orange-100 text-orange-700 ring-1 ring-inset ring-orange-200',
+                                                'completed'        => 'bg-green-100 text-green-700 ring-1 ring-inset ring-green-200',
+                                                'needs_revision'   => 'bg-red-100 text-red-700 ring-1 ring-inset ring-red-200',
+                                                'rejected'         => 'bg-gray-100 text-gray-700 ring-1 ring-inset ring-gray-200',
+                                            ];
+
+                                            $statusIcons = [
+                                                'pending_approval' => 'ti-clock',
+                                                'approved'         => 'ti-check',
+                                                'assigned'         => 'ti-user-check',
+                                                'in_progress'      => 'ti-tool',
+                                                'completed'        => 'ti-circle-check',
+                                                'needs_revision'   => 'ti-alert-circle',
+                                                'rejected'         => 'ti-x',
+                                            ];
+
+                                            $statusClass = $statusStyles[$job->status] ?? 'bg-gray-100 text-gray-700 ring-gray-200';
+                                            $statusIcon = $statusIcons[$job->status] ?? 'ti-help-circle';
+                                        @endphp
+
+                                        <span
+                                            class="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium {{ $statusClass }}"
+                                        >
+                                            <i class="ti {{ $statusIcon }} text-sm"></i>
+
                                             {{ str_replace('_', ' ', ucwords($job->status)) }}
                                         </span>
 
