@@ -15,7 +15,7 @@
                                 {{ str_replace('_', ' ', ucwords($s)) }}</option>
                         @endforeach
                     </select>
-                    <button class="rounded-lg border px-4 text-sm">Filter</button>
+                    <button class="rounded-lg border px-4 text-sm">Search</button>
                 </form>
                 <div class="overflow-x-auto rounded-xl border">
                     <table class="w-full text-sm">

@@ -246,17 +246,30 @@ class JobOrderController extends Controller
     public function mechanicOrders(Request $request): View
     {
         $staff = Staff::where('user_id', auth()->id())->firstOrFail();
+
         $query = JobOrder::with([
             'customer',
             'vehicle',
             'services',
             'assignments.staff.user',
-            'approvals.approvedBy'
+            'approvals.approvedBy',
         ])
-            ->whereHas('assignments', fn ($q) => $q->where('staff_id', $staff->staff_id))
+            ->where(function ($q) use ($staff) {
+
+                // Job orders created by the logged-in mechanic
+                $q->where('created_by', auth()->id())
+
+                    // OR job orders assigned to the logged-in mechanic
+                    ->orWhereHas('assignments', function ($assignment) use ($staff) {
+                        $assignment->where('staff_id', $staff->staff_id);
+                    });
+            })
             ->latest('job_order_id');
+
         $this->applyFilters($query, $request);
-        $jobs = $query->paginate(5)->withQueryString();
+
+        $jobs = $query->paginate(20)->withQueryString();
+
         return view('mechanic.MJO', compact('jobs'));
     }
 

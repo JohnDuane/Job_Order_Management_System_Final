@@ -86,7 +86,7 @@
                             'assigned' => 'Assigned',
                             'in_progress' => 'In progress',
                             'completed' => 'Completed',
-                            'needs_revision' => 'Needs revision'
+                            'needs_revision' => 'Needs revision / Rejected'
                         ] as $key => $label)
 
                             <option
@@ -1224,9 +1224,9 @@
                 {{-- PAGINATION --}}
                 {{-- ========================================================= --}}
 
-                <div class="mt-5">
+                {{-- <div class="mt-5">
                     {{ $jobs->links() }}
-                </div>
+                </div> --}}
 
             </main>
 
