@@ -103,10 +103,7 @@
 
                     <button
                         type="submit"
-                        class="inline-flex items-center justify-center
-                               gap-2 rounded-lg border border-gray-200
-                               px-4 py-2.5 text-sm text-gray-700
-                               transition hover:bg-gray-50"
+                        class="rounded-lg bg-gray-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-800 transition"
                     >
                         <i class="ti ti-search"></i>
                         Search
@@ -923,38 +920,53 @@
 
                                             <div>
 
-                                                <h3
-                                                    class="text-sm font-semibold
-                                                           text-gray-900"
-                                                >
+                                                <h3 class="text-sm font-semibold text-gray-900">
                                                     Remarks
                                                 </h3>
 
+                                                <div class="mt-3 space-y-3">
 
-                                                <div
-                                                    class="mt-3 rounded-xl
-                                                           border border-gray-200
-                                                           bg-gray-50 p-4"
-                                                >
 
-                                                    @if ($job->remarks)
+                                                    {{-- Supervisor Assignment Remarks --}}
+                                                    @php
+                                                        $assignmentRemarks = $job->assignments
+                                                            ->pluck('remarks')
+                                                            ->filter()
+                                                            ->unique()
+                                                            ->values();
+                                                    @endphp
 
-                                                        <p
-                                                            class="whitespace-pre-line
-                                                                   text-sm leading-6
-                                                                   text-gray-700"
-                                                        >
-                                                            {{ $job->remarks }}
-                                                        </p>
+                                                    @if ($assignmentRemarks->count())
 
-                                                    @else
+                                                        <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
 
-                                                        <p
-                                                            class="text-sm
-                                                                   text-gray-400"
-                                                        >
-                                                            No remarks provided.
-                                                        </p>
+                                                            <p class="text-xs font-medium text-gray-400">
+                                                                Supervisor assignment remarks
+                                                            </p>
+
+                                                            @foreach ($assignmentRemarks as $remark)
+
+                                                                <p class="mt-1 whitespace-pre-line text-sm leading-6 text-gray-700">
+                                                                    {{ $remark }}
+                                                                </p>
+
+                                                            @endforeach
+
+                                                        </div>
+
+                                                    @endif
+
+
+                                                    {{-- Nothing available --}}
+                                                    @if (!$job->remarks && !$assignmentRemarks->count())
+
+                                                        <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
+
+                                                            <p class="text-sm text-gray-400">
+                                                                No remarks provided.
+                                                            </p>
+
+                                                        </div>
 
                                                     @endif
 
@@ -1224,9 +1236,9 @@
                 {{-- PAGINATION --}}
                 {{-- ========================================================= --}}
 
-                {{-- <div class="mt-5">
+                <div class="mt-5">
                     {{ $jobs->links() }}
-                </div> --}}
+                </div>
 
             </main>
 

@@ -143,26 +143,129 @@ class JobOrderController extends Controller
 
     public function supervisorAll(Request $request): View
     {
-        $query = JobOrder::with(['customer', 'vehicle', 'services', 'assignments.staff.user', 'creator'])->latest('job_order_id');
+        $query = JobOrder::with([
+            'customer',
+            'vehicle',
+            'services',
+            'assignments.staff.user',
+            'approvals.approvedBy',
+            'creator',
+        ])
+            ->latest('job_order_id');
+
         $this->applyFilters($query, $request);
+
         $jobs = $query->paginate(5)->withQueryString();
+
         return view('supervisor.AJO', compact('jobs'));
     }
 
     public function pendingApprovals(Request $request): View
     {
-        $query = JobOrder::with(['customer', 'vehicle', 'services', 'creator'])
-            ->where('status', 'pending_approval')
-            ->latest('job_order_id');
+        $query = JobOrder::with([
+            'customer',
+            'vehicle',
+            'services',
+            'creator'
+        ])
+            ->where('status', 'pending_approval');
+
+        // Search
         $this->applyFilters($query, $request);
-        $jobs = $query->paginate(5)->withQueryString();
+
+        // Sorting / Filter
+        if ($request->input('sort') === 'oldest') {
+            $query->oldest('job_order_id');
+        } else {
+            $query->latest('job_order_id');
+        }
+
+        $jobs = $query->paginate(3)->withQueryString();
+
         return view('supervisor.pending-approvals', compact('jobs'));
     }
 
     public function approvalHistory(Request $request): View
     {
-        $approvals = JobOrderApproval::with(['jobOrder.customer', 'jobOrder.vehicle', 'approvedBy'])
-            ->latest('id')->paginate(5)->withQueryString();
+        $query = JobOrderApproval::with([
+            'jobOrder.customer',
+            'jobOrder.vehicle',
+            'jobOrder.services',
+            'jobOrder.assignments.staff.user',
+            'jobOrder.creator',
+            'jobOrder.approvals.approvedBy',
+            'approvedBy',
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Search
+        |--------------------------------------------------------------------------
+        */
+
+        $search = trim((string) $request->input('search'));
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+
+                // Search Job Order ID / Code
+                $jobOrderNumber = preg_replace('/[^0-9]/', '', $search);
+
+                if ($jobOrderNumber !== '') {
+                    $q->whereHas('jobOrder', function ($jobQuery) use ($jobOrderNumber) {
+                        $jobQuery->where('job_order_id', (int) $jobOrderNumber);
+                    });
+                }
+
+                // Search customer name
+                $q->orWhereHas('jobOrder.customer', function ($customer) use ($search) {
+                    $customer->where(function ($customerQuery) use ($search) {
+                        $customerQuery
+                            ->where('first_name', 'like', "%{$search}%")
+                            ->orWhere('last_name', 'like', "%{$search}%")
+                            ->orWhereRaw(
+                                "CONCAT(first_name, ' ', last_name) LIKE ?",
+                                ["%{$search}%"]
+                            );
+                    });
+                });
+            });
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Decision Filter
+        |--------------------------------------------------------------------------
+        */
+
+        $status = $request->input('status');
+
+        if ($status !== null && $status !== '') {
+            $query->where('status', $status);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Sorting
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->input('sort') === 'oldest') {
+            $query->oldest('id');
+        } else {
+            $query->latest('id');
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Pagination
+        |--------------------------------------------------------------------------
+        */
+
+        $approvals = $query
+            ->paginate(5)
+            ->withQueryString();
+
         return view('supervisor.approval-history', compact('approvals'));
     }
 
@@ -208,10 +311,33 @@ class JobOrderController extends Controller
 
     public function assignmentPage(Request $request): View
     {
-        $jobs = JobOrder::with(['customer', 'vehicle', 'services', 'assignments.staff.user'])
-            ->whereIn('status', ['approved', 'assigned', 'in_progress'])
-            ->latest('job_order_id')->paginate(5)->withQueryString();
-        $mechanics = Staff::with('user')->whereHas('user', fn ($q) => $q->where('role', 'mechanic'))->orderBy('staff_last')->get();
+        $query = JobOrder::with([
+            'customer',
+            'vehicle',
+            'services',
+            'assignments.staff.user'
+        ])
+            ->whereIn('status', ['approved', 'assigned', 'in_progress']);
+
+        // Search + status filter
+        $this->applyFilters($query, $request);
+
+        // Sorting
+        if ($request->input('sort') === 'oldest') {
+            $query->oldest('job_order_id');
+        } else {
+            $query->latest('job_order_id');
+        }
+
+        // Pagination
+        $jobs = $query->paginate(3)->withQueryString();
+
+        // Available mechanics
+        $mechanics = Staff::with('user')
+            ->whereHas('user', fn ($q) => $q->where('role', 'mechanic'))
+            ->orderBy('staff_last')
+            ->get();
+
         return view('supervisor.assign-mechanic', compact('jobs', 'mechanics'));
     }
 
@@ -268,17 +394,35 @@ class JobOrderController extends Controller
 
         $this->applyFilters($query, $request);
 
-        $jobs = $query->paginate(20)->withQueryString();
+        $jobs = $query->paginate(3)->withQueryString();
 
         return view('mechanic.MJO', compact('jobs'));
     }
 
-    public function needsRevision(): View
+    public function needsRevision(Request $request): View
     {
-        $jobs = JobOrder::with(['customer', 'vehicle', 'services', 'approvals' => fn ($q) => $q->latest('id')])
+        $query = JobOrder::with([
+            'customer',
+            'vehicle',
+            'services',
+            'approvals' => fn ($q) => $q->latest('id'),
+        ])
             ->where('created_by', auth()->id())
-            ->where('status', 'needs_revision')
-            ->latest('job_order_id')->get();
+            ->where('status', 'needs_revision');
+
+        // Search (same logic as the other job order pages)
+        $this->applyFilters($query, $request);
+
+        // Sorting
+        if ($request->input('sort') === 'oldest') {
+            $query->oldest('job_order_id');
+        } else {
+            $query->latest('job_order_id');
+        }
+
+        // 3 cards per page
+        $jobs = $query->paginate(3)->withQueryString();
+
         return view('mechanic.needs-revision', compact('jobs'));
     }
 
@@ -466,14 +610,53 @@ class JobOrderController extends Controller
     private function applyFilters($query, Request $request): void
     {
         $search = trim((string) $request->input('search'));
+
         if ($search !== '') {
+
             $query->where(function ($q) use ($search) {
-                $q->where('job_order_id', 'like', '%' . preg_replace('/[^0-9]/', '', $search) . '%')
-                    ->orWhereHas('customer', fn ($c) => $c->whereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$search}%"]))
-                    ->orWhereHas('vehicle', fn ($v) => $v->where('plate_number', 'like', "%{$search}%")->orWhere('make', 'like', "%{$search}%"));
+
+                /*
+                 Job Order Search
+                */
+
+                $jobOrderNumber = preg_replace('/[^0-9]/', '', $search);
+
+                if ($jobOrderNumber !== '') {
+                    $jobOrderNumber = (int) $jobOrderNumber;
+
+                    $q->where('job_order_id', $jobOrderNumber);
+                }
+
+                /*
+                | Customer Search
+                */
+
+                $q->orWhereHas('customer', function ($customer) use ($search) {
+
+                    $customer->where(function ($customerQuery) use ($search) {
+
+                        $customerQuery
+                            ->where('first_name', 'like', "%{$search}%")
+                            ->orWhere('last_name', 'like', "%{$search}%")
+                            ->orWhereRaw(
+                                "CONCAT(first_name, ' ', last_name) LIKE ?",
+                                ["%{$search}%"]
+                            );
+
+                    });
+
+                });
+
             });
         }
-        if ($status = $request->input('status')) {
+
+        /*
+        Status Filter       
+        */
+
+        $status = $request->input('status');
+
+        if ($status !== null && $status !== '') {
             $query->where('status', $status);
         }
     }
