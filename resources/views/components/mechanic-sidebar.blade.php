@@ -214,7 +214,11 @@
     {{-- DESKTOP SIDEBAR --}}
     {{-- ========================================================= --}}
 
-    <aside class="hidden md:flex w-56 shrink-0 bg-[#fbfff9] border-r border-gray-200 p-4 flex-col gap-1">
+    <aside
+        class="hidden md:flex w-56 shrink-0 h-screen sticky top-0
+            bg-[#fbfff9] border-r border-gray-200
+            p-4 flex-col gap-1"
+    >
 
         <div class="flex items-center justify-center px-2 pb-6 pt-1">
 

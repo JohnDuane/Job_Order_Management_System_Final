@@ -8,7 +8,7 @@
         }"
     >
 
-        <div class="min-h-screen lg:flex">
+        <div class="min-h-screen md:flex">
 
             <x-mechanic-sidebar />
 

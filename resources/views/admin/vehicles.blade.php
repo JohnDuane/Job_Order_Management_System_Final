@@ -47,23 +47,43 @@
                 <div class="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center">
 
                     {{-- Search --}}
-                    <div class="relative w-full sm:max-w-md">
+                    <div class="flex w-full gap-2 sm:max-w-xl">
 
-                        <i
-                            class="ti ti-search absolute left-3 top-1/2
-                                   -translate-y-1/2 text-gray-400"
-                        ></i>
+                        <div class="relative flex-1">
 
-                        <input
-                            type="text"
-                            x-model="search"
-                            placeholder="Search vehicles..."
-                            class="w-full rounded-lg border border-gray-200
-                                   bg-white py-2.5 pl-9 pr-3 text-sm
-                                   text-gray-900 placeholder:text-gray-400
-                                   focus:border-gray-300 focus:outline-none
-                                   focus:ring-2 focus:ring-gray-100"
+                            <i
+                                class="ti ti-search absolute left-3 top-1/2
+                                    -translate-y-1/2 text-gray-400"
+                            ></i>
+
+                            <input
+                                type="text"
+                                x-model="searchInput"
+                                @keydown.enter="applySearch()"
+                                placeholder="Search vehicles, owner, plate..."
+                                class="w-full rounded-lg border border-gray-200
+                                    bg-white py-2.5 pl-9 pr-3 text-sm
+                                    text-gray-900 placeholder:text-gray-400
+                                    focus:border-gray-300 focus:outline-none
+                                    focus:ring-2 focus:ring-gray-100"
+                            >
+
+                        </div>
+
+                        <button
+                            type="button"
+                            @click="applySearch()"
+                            class="inline-flex shrink-0 items-center gap-2
+                                rounded-lg bg-gray-900 px-4 py-2.5
+                                text-sm font-medium text-white
+                                transition hover:bg-gray-800"
                         >
+
+                            <i class="ti ti-search"></i>
+
+                            Search
+
+                        </button>
 
                     </div>
 
@@ -237,6 +257,7 @@
                             <button
                                 type="button"
                                 @click="
+                                    searchInput = '';
                                     search = '';
                                     sort = 'az';
                                     open = false;
@@ -540,7 +561,10 @@
 
                                             <button
                                                 type="button"
-                                                @click="search = ''"
+                                                @click="
+                                                    searchInput = '';
+                                                    search = '';
+                                                "
                                                 class="mt-4 text-xs font-medium
                                                        text-gray-700 underline
                                                        underline-offset-2
@@ -941,6 +965,8 @@
         function vehicleTable() {
             return {
 
+                searchInput: '',
+
                 search: '',
 
                 sort: 'az',
@@ -1108,6 +1134,15 @@
 
 
                     return results;
+                },
+
+                /*
+                * Apply search.
+                */
+                applySearch() {
+
+                    this.search = this.searchInput.trim();
+
                 },
 
 

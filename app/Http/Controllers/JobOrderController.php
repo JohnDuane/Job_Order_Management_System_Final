@@ -135,9 +135,19 @@ class JobOrderController extends Controller
 
     public function adminIndex(Request $request): View
     {
-        $query = JobOrder::with(['customer', 'vehicle', 'services', 'assignments.staff.user', 'creator'])->latest('job_order_id');
+        $query = JobOrder::with([
+            'customer',
+            'vehicle',
+            'services',
+            'assignments.staff.user',
+            'approvals.approvedBy',
+            'creator',
+        ])->latest('job_order_id');
+
         $this->applyFilters($query, $request);
+
         $jobs = $query->paginate(5)->withQueryString();
+
         return view('admin.job-orders', compact('jobs'));
     }
 
@@ -166,7 +176,9 @@ class JobOrderController extends Controller
             'customer',
             'vehicle',
             'services',
-            'creator'
+            'creator',
+            'assignments.staff.user',
+            'approvals.approvedBy',
         ])
             ->where('status', 'pending_approval');
 

@@ -3,7 +3,9 @@
 {{-- ========================================================= --}}
 
 <aside
-    class="hidden lg:flex w-56 shrink-0 bg-[#fff9f9] border-r border-gray-200 p-4 flex-col"
+    class="hidden lg:flex w-56 shrink-0 h-screen sticky top-0
+           bg-[#fff9f9] border-r border-gray-200
+           p-4 flex-col"
 >
 
     {{-- Logo --}}

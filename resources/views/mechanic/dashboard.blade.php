@@ -2,7 +2,7 @@
 
     <div class="min-h-screen bg-white text-gray-900">
 
-        <div class="min-h-screen lg:flex">
+        <div class="min-h-screen md:flex">
 
             {{-- Mechanic Sidebar --}}
             <x-mechanic-sidebar />
