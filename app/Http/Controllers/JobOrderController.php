@@ -427,185 +427,318 @@ class JobOrderController extends Controller
     }
 
     public function dashboard(): View
-{
-    /*
-    |--------------------------------------------------------------------------
-    | Base Job Order Query
-    |--------------------------------------------------------------------------
-    */
+    {
+        /*
+        |--------------------------------------------------------------------------
+        | Base Job Order Query
+        |--------------------------------------------------------------------------
+        |
+        | Admin/Supervisor:
+        |   See all job orders.
+        |
+        | Mechanic:
+        |   See ONLY job orders assigned to the logged-in mechanic.
+        |
+        */
 
-    $base = JobOrder::query();
+        $base = JobOrder::query();
 
+        if (auth()->user()->isMechanic()) {
+            $staff = Staff::where('user_id', auth()->id())->first();
 
-    /*
-    |--------------------------------------------------------------------------
-    | Mechanics only see their assigned job orders
-    |--------------------------------------------------------------------------
-    */
+            $base->where(function ($q) use ($staff) {
+                $q->where('created_by', auth()->id());
 
-    if (auth()->user()->isMechanic()) {
-
-        $staff = Staff::where('user_id', auth()->id())->first();
-
-        if ($staff) {
-            $base->whereHas('assignments', function ($query) use ($staff) {
-                $query->where('staff_id', $staff->staff_id);
+                if ($staff) {
+                    $q->orWhereHas('assignments', fn ($a) => $a->where('staff_id', $staff->staff_id));
+                }
             });
         }
-    }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Basic Dashboard Counts
-    |--------------------------------------------------------------------------
-    */
+        /*
+        |--------------------------------------------------------------------------
+        | Basic Counts
+        |--------------------------------------------------------------------------
+        */
 
-    $customerCount = Customer::count();
+        $customerCount = Customer::count();
 
-    $vehicleCount = Vehicle::count();
+        $vehicleCount = Vehicle::count();
 
-    $staffCount = \App\Models\User::whereIn(
-        'role',
-        ['admin', 'supervisor', 'mechanic']
-    )->count();
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Job Counts
-    |--------------------------------------------------------------------------
-    */
-
-    $jobCountWeek = (clone $base)
-        ->whereBetween('date_issued', [
-            now()->startOfWeek()->toDateString(),
-            now()->endOfWeek()->toDateString(),
-        ])
-        ->count();
+        $staffCount = \App\Models\User::whereIn(
+            'role',
+            ['admin', 'supervisor', 'mechanic']
+        )->count();
 
 
-    $jobCountMonth = (clone $base)
-        ->whereBetween('date_issued', [
-            now()->startOfMonth()->toDateString(),
-            now()->endOfMonth()->toDateString(),
-        ])
-        ->count();
+        /*
+        |--------------------------------------------------------------------------
+        | Job Counts
+        |--------------------------------------------------------------------------
+        */
 
-
-    $jobCountYear = (clone $base)
-        ->whereBetween('date_issued', [
-            now()->startOfYear()->toDateString(),
-            now()->endOfYear()->toDateString(),
-        ])
-        ->count();
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Job Activity Chart
-    |--------------------------------------------------------------------------
-    |
-    | Shows job orders created during the last 7 days.
-    |
-    */
-
-    $jobActivityLabels = [];
-
-    $jobActivityData = [];
-
-
-    for ($i = 6; $i >= 0; $i--) {
-
-        $date = now()->subDays($i);
-
-        $jobActivityLabels[] = $date->format('M d');
-
-
-        $jobActivityData[] = (clone $base)
-            ->whereDate('date_issued', $date->toDateString())
+        $jobCountWeek = (clone $base)
+            ->whereBetween('date_issued', [
+                now()->startOfWeek()->toDateString(),
+                now()->endOfWeek()->toDateString(),
+            ])
             ->count();
+
+        $jobCountMonth = (clone $base)
+            ->whereBetween('date_issued', [
+                now()->startOfMonth()->toDateString(),
+                now()->endOfMonth()->toDateString(),
+            ])
+            ->count();
+
+        $jobCountYear = (clone $base)
+            ->whereBetween('date_issued', [
+                now()->startOfYear()->toDateString(),
+                now()->endOfYear()->toDateString(),
+            ])
+            ->count();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Job Activity Chart
+        |--------------------------------------------------------------------------
+        |
+        | Last 7 days.
+        |
+        | For mechanics, this is ONLY their assigned job orders.
+        |
+        */
+
+        $jobActivityLabels = [];
+
+        $jobActivityData = [];
+
+        for ($i = 6; $i >= 0; $i--) {
+
+            $date = now()->subDays($i);
+
+            $jobActivityLabels[] = $date->format('M d');
+
+            $jobActivityData[] = (clone $base)
+                ->whereDate('date_issued', $date->toDateString())
+                ->count();
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Job Status Chart
+        |--------------------------------------------------------------------------
+        |
+        | This also respects the mechanic-specific $base query.
+        |
+        */
+
+        $jobStatusData = [
+
+            'pending_approval' => (clone $base)
+                ->where('status', 'pending_approval')
+                ->count(),
+
+            'approved' => (clone $base)
+                ->where('status', 'approved')
+                ->count(),
+
+            'assigned' => (clone $base)
+                ->where('status', 'assigned')
+                ->count(),
+
+            'in_progress' => (clone $base)
+                ->where('status', 'in_progress')
+                ->count(),
+
+            'completed' => (clone $base)
+                ->where('status', 'completed')
+                ->count(),
+
+            'needs_revision' => (clone $base)
+                ->where('status', 'needs_revision')
+                ->count(),
+
+            'rejected' => (clone $base)
+                ->where('status', 'rejected')
+                ->count(),
+        ];
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | NEW: Mechanic Job Status Activity
+        |--------------------------------------------------------------------------
+        |
+        | This is the data used by the multi-line chart.
+        |
+        | Each line represents:
+        |
+        | Green  = Completed
+        | Yellow = Pending Approval
+        | Red    = Rejected / Needs Revision
+        |
+        */
+
+        $statusActivityLabels = [];
+
+        $completedActivity = [];
+
+        $pendingActivity = [];
+
+        $revisionActivity = [];
+
+
+        for ($i = 6; $i >= 0; $i--) {
+
+            $date = now()->subDays($i);
+
+            $statusActivityLabels[] = $date->format('M d');
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Completed
+            |--------------------------------------------------------------------------
+            */
+
+            $completedActivity[] = (clone $base)
+                ->whereDate('date_issued', $date->toDateString())
+                ->where('status', 'completed')
+                ->count();
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Pending Approval
+            |--------------------------------------------------------------------------
+            */
+
+            $pendingActivity[] = (clone $base)
+                ->whereDate('date_issued', $date->toDateString())
+                ->where('status', 'pending_approval')
+                ->count();
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Rejected / Needs Revision
+            |--------------------------------------------------------------------------
+            |
+            | Your system currently uses "needs_revision".
+            |
+            | We include "rejected" too in case you use that status later.
+            |
+            */
+
+            $revisionActivity[] = (clone $base)
+                ->whereDate('date_issued', $date->toDateString())
+                ->whereIn('status', [
+                    'rejected',
+                    'needs_revision',
+                ])
+                ->count();
+        }
+
+        /*
+          Completed job orders per month (last 6) and per week (last 6)
+        */
+        $activityMonthLabels = [];
+        $activityMonthData   = [];
+
+        for ($i = 5; $i >= 0; $i--) {
+            $start = now()->startOfMonth()->subMonthsNoOverflow($i);
+            $end   = (clone $start)->endOfMonth();
+
+            $activityMonthLabels[] = $start->format('M Y');
+            $activityMonthData[]   = (clone $base)
+                ->where('status', 'completed')
+                ->whereBetween('date_issued', [$start->toDateString(), $end->toDateString()])
+                ->count();
+        }
+
+        $activityWeekLabels = [];
+        $activityWeekData   = [];
+
+        for ($i = 5; $i >= 0; $i--) {
+            $start = now()->startOfWeek()->subWeeks($i);
+            $end   = (clone $start)->endOfWeek();
+
+            $activityWeekLabels[] = $start->format('M d');
+            $activityWeekData[]   = (clone $base)
+                ->where('status', 'completed')
+                ->whereBetween('date_issued', [$start->toDateString(), $end->toDateString()])
+                ->count();
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Recent Job Orders
+        |--------------------------------------------------------------------------
+        */
+
+        $recentJobs = (clone $base)
+            ->with([
+                'customer',
+                'vehicle',
+            ])
+            ->latest('job_order_id')
+            ->limit(8)
+            ->get();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Return Dashboard
+        |--------------------------------------------------------------------------
+        */
+
+        return view(auth()->user()->role . '.dashboard', [
+
+            'customerCount' => $customerCount,
+
+            'vehicleCount' => $vehicleCount,
+
+            'staffCount' => $staffCount,
+
+            'jobCountWeek' => $jobCountWeek,
+
+            'jobCountMonth' => $jobCountMonth,
+
+            'jobCountYear' => $jobCountYear,
+
+            'recentJobs' => $recentJobs,
+
+            'jobActivityLabels' => $jobActivityLabels,
+
+            'jobActivityData' => $jobActivityData,
+
+            'jobStatusData' => $jobStatusData,
+
+            /*
+            |--------------------------------------------------------------------------
+            | NEW CHART DATA
+            |--------------------------------------------------------------------------
+            */
+
+            'statusActivityLabels' => $statusActivityLabels,
+
+            'completedActivity' => $completedActivity,
+
+            'pendingActivity' => $pendingActivity,
+
+            'revisionActivity' => $revisionActivity,
+
+            'activityMonthLabels' => $activityMonthLabels,
+            'activityMonthData'   => $activityMonthData,
+            'activityWeekLabels'  => $activityWeekLabels,
+            'activityWeekData'    => $activityWeekData,
+        ]);
     }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Job Status Chart
-    |--------------------------------------------------------------------------
-    */
-
-    $jobStatusData = [
-
-        'pending_approval' => (clone $base)
-            ->where('status', 'pending_approval')
-            ->count(),
-
-        'approved' => (clone $base)
-            ->where('status', 'approved')
-            ->count(),
-
-        'assigned' => (clone $base)
-            ->where('status', 'assigned')
-            ->count(),
-
-        'in_progress' => (clone $base)
-            ->where('status', 'in_progress')
-            ->count(),
-
-        'completed' => (clone $base)
-            ->where('status', 'completed')
-            ->count(),
-
-        'needs_revision' => (clone $base)
-            ->where('status', 'needs_revision')
-            ->count(),
-
-        'rejected' => (clone $base)
-            ->where('status', 'rejected')
-            ->count(),
-    ];
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Recent Job Orders
-    |--------------------------------------------------------------------------
-    */
-
-    $recentJobs = (clone $base)
-        ->with([
-            'customer',
-            'vehicle',
-        ])
-        ->latest('job_order_id')
-        ->limit(8)
-        ->get();
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Return Dashboard
-    |--------------------------------------------------------------------------
-    */
-
-    return view(auth()->user()->role . '.dashboard', [
-
-        'customerCount' => $customerCount,
-
-        'vehicleCount' => $vehicleCount,
-
-        'staffCount' => $staffCount,
-
-        'jobCountWeek' => $jobCountWeek,
-        'jobCountMonth' => $jobCountMonth,
-        'jobCountYear' => $jobCountYear,
-        'recentJobs' => $recentJobs,
-        'jobActivityLabels' => $jobActivityLabels,
-        'jobActivityData' => $jobActivityData,
-        'jobStatusData' => $jobStatusData,
-
-    ]);
-}
 
     private function applyFilters($query, Request $request): void
     {

@@ -8,11 +8,11 @@
         }"
     >
 
-        <div class="flex min-h-screen">
+        <div class="min-h-screen lg:flex">
 
             <x-mechanic-sidebar />
 
-            <main class="flex-1 min-w-0 p-8">
+            <main class="min-w-0 flex-1 flex-col gap-6 p-4 sm:p-6 lg:p-8">
 
                 {{-- Header --}}
                 <div class="mb-6">
@@ -72,83 +72,399 @@
 
 
                     {{-- Customer and Vehicle --}}
-                    <div class="bg-white border border-gray-200 rounded-xl p-5">
+                    {{-- ========================================================= --}}
+                    {{-- CUSTOMER AND VEHICLE --}}
+                    {{-- ========================================================= --}}
+
+                    <div
+                        class="bg-white border border-gray-200 rounded-xl p-5"
+                        x-data="{
+                            customerOpen: false,
+                            vehicleOpen: false,
+
+                            customerSearch: '',
+                            vehicleSearch: '',
+
+                            customer: '{{ old('cust_id', $jobOrder->cust_id ?? '') }}',
+                            vehicle: '{{ old('vehicle_id', $jobOrder->vehicle_id ?? '') }}',
+
+                            customers: @js(
+                                $customers->map(function ($c) {
+                                    return [
+                                        'id' => (string) $c->cust_id,
+                                        'name' => $c->first_name . ' ' . $c->last_name,
+                                        'vehicles' => $c->vehicles->map(function ($v) {
+                                            return [
+                                                'id' => (string) $v->vehicle_id,
+                                                'make' => $v->make,
+                                                'plate' => $v->plate_number,
+                                            ];
+                                        })->values(),
+                                    ];
+                                })->values()
+                            ),
+
+                            get selectedCustomer() {
+                                return this.customers.find(
+                                    c => c.id === String(this.customer)
+                                );
+                            },
+
+                            get selectedVehicle() {
+                                if (!this.selectedCustomer) return null;
+
+                                return this.selectedCustomer.vehicles.find(
+                                    v => v.id === String(this.vehicle)
+                                );
+                            },
+
+                            get filteredCustomers() {
+                                const search = this.customerSearch.toLowerCase().trim();
+
+                                if (!search) return this.customers;
+
+                                return this.customers.filter(customer =>
+                                    customer.name.toLowerCase().includes(search)
+                                );
+                            },
+
+                            get filteredVehicles() {
+                                if (!this.selectedCustomer) return [];
+
+                                const search = this.vehicleSearch.toLowerCase().trim();
+
+                                if (!search) return this.selectedCustomer.vehicles;
+
+                                return this.selectedCustomer.vehicles.filter(vehicle =>
+                                    `${vehicle.make} ${vehicle.plate}`
+                                        .toLowerCase()
+                                        .includes(search)
+                                );
+                            },
+
+                            selectCustomer(customer) {
+                                this.customer = customer.id;
+
+                                // Reset vehicle whenever customer changes
+                                this.vehicle = '';
+                                this.vehicleSearch = '';
+
+                                this.customerSearch = customer.name;
+                                this.customerOpen = false;
+
+                                this.$nextTick(() => {
+                                    this.vehicleOpen = true;
+                                });
+                            },
+
+                            selectVehicle(vehicle) {
+                                this.vehicle = vehicle.id;
+
+                                this.vehicleSearch =
+                                    `${vehicle.make} · ${vehicle.plate}`;
+
+                                this.vehicleOpen = false;
+                            }
+                        }"
+                    >
 
                         <p class="font-medium">
                             Customer and vehicle
                         </p>
 
                         <p class="text-xs text-gray-500 mt-1 mb-5">
-                            Select the customer and vehicle for this job order.
+                            Search and select the customer and their vehicle for this job order.
                         </p>
 
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-                            {{-- Customer --}}
-                            <div>
+
+                            {{-- ================================================= --}}
+                            {{-- CUSTOMER --}}
+                            {{-- ================================================= --}}
+
+                            <div class="relative">
 
                                 <label class="block text-sm font-medium mb-1.5">
                                     Customer
                                 </label>
 
-                                <select
+                                {{-- Hidden actual form value --}}
+                                <input
+                                    type="hidden"
                                     name="cust_id"
                                     x-model="customer"
-                                    required
-                                    class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:border-gray-400 focus:ring-2 focus:ring-gray-100"
                                 >
 
-                                    <option value="">
-                                        Select customer
-                                    </option>
+                                {{-- Search / Selected Customer --}}
+                                <div class="relative">
 
-                                    @foreach ($customers as $c)
+                                    <i
+                                        class="ti ti-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                                    ></i>
 
-                                        <option value="{{ $c->cust_id }}">
-                                            {{ $c->first_name }} {{ $c->last_name }}
-                                        </option>
+                                    <input
+                                        type="text"
+                                        x-model="customerSearch"
+                                        @focus="customerOpen = true"
+                                        @click="customerOpen = true"
+                                        @input="customerOpen = true"
+                                        @keydown.escape="customerOpen = false"
+                                        placeholder="Search customer..."
+                                        autocomplete="off"
+                                        class="w-full rounded-lg border border-gray-200 bg-white py-2.5 pl-9 pr-10 text-sm focus:border-gray-400 focus:ring-2 focus:ring-gray-100"
+                                    >
 
-                                    @endforeach
+                                    <button
+                                        type="button"
+                                        x-show="customer"
+                                        x-cloak
+                                        @click="
+                                            customer = '';
+                                            customerSearch = '';
+                                            vehicle = '';
+                                            vehicleSearch = '';
+                                        "
+                                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700"
+                                    >
+                                        <i class="ti ti-x"></i>
+                                    </button>
 
-                                </select>
+                                    <i
+                                        x-show="!customer"
+                                        class="ti ti-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                                    ></i>
+
+                                </div>
+
+
+                                {{-- Customer Dropdown --}}
+                                <div
+                                    x-show="customerOpen"
+                                    x-cloak
+                                    @click.outside="customerOpen = false"
+                                    x-transition
+                                    class="absolute z-40 mt-1 w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg"
+                                >
+
+                                    {{-- Results --}}
+                                    <div class="max-h-60 overflow-y-auto">
+
+                                        <template x-if="filteredCustomers.length === 0">
+
+                                            <div class="px-4 py-6 text-center">
+
+                                                <i class="ti ti-user-off text-2xl text-gray-300"></i>
+
+                                                <p class="mt-2 text-sm text-gray-500">
+                                                    No customers found.
+                                                </p>
+
+                                            </div>
+
+                                        </template>
+
+
+                                        <template
+                                            x-for="customerItem in filteredCustomers"
+                                            :key="customerItem.id"
+                                        >
+
+                                            <button
+                                                type="button"
+                                                @click="selectCustomer(customerItem)"
+                                                class="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition"
+                                                :class="customer == customerItem.id ? 'bg-gray-50' : ''"
+                                            >
+
+                                                {{-- Avatar --}}
+                                                <div
+                                                    class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-600"
+                                                >
+                                                    <i class="ti ti-user"></i>
+                                                </div>
+
+
+                                                {{-- Customer Info --}}
+                                                <div class="min-w-0 flex-1">
+
+                                                    <p
+                                                        class="truncate text-sm font-medium text-gray-900"
+                                                        x-text="customerItem.name"
+                                                    ></p>
+
+                                                    <p
+                                                        class="text-xs text-gray-500"
+                                                    >
+                                                        <span
+                                                            x-text="customerItem.vehicles.length"
+                                                        ></span>
+
+                                                        vehicle<span
+                                                            x-show="customerItem.vehicles.length !== 1"
+                                                        >s</span>
+                                                    </p>
+
+                                                </div>
+
+
+                                                {{-- Selected --}}
+                                                <i
+                                                    x-show="customer == customerItem.id"
+                                                    class="ti ti-check text-gray-700"
+                                                ></i>
+
+                                            </button>
+
+                                        </template>
+
+                                    </div>
+
+                                </div>
 
                             </div>
 
 
-                            {{-- Vehicle --}}
-                            <div>
+                            {{-- ================================================= --}}
+                            {{-- VEHICLE --}}
+                            {{-- ================================================= --}}
+
+                            <div class="relative">
 
                                 <label class="block text-sm font-medium mb-1.5">
                                     Vehicle
                                 </label>
 
-                                <select
+                                {{-- Hidden actual form value --}}
+                                <input
+                                    type="hidden"
                                     name="vehicle_id"
-                                    required
-                                    class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:border-gray-400 focus:ring-2 focus:ring-gray-100"
+                                    x-model="vehicle"
                                 >
 
-                                    <option value="">
-                                        Select vehicle
-                                    </option>
 
-                                    @foreach ($customers as $c)
+                                {{-- Vehicle Search --}}
+                                <div class="relative">
 
-                                        @foreach ($c->vehicles as $v)
+                                    <i
+                                        class="ti ti-car absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                                    ></i>
 
-                                            <option
-                                                value="{{ $v->vehicle_id }}"
-                                                x-show="customer == '{{ $c->cust_id }}'"
+                                    <input
+                                        type="text"
+                                        x-model="vehicleSearch"
+                                        @focus="selectedCustomer && (vehicleOpen = true)"
+                                        @click="selectedCustomer && (vehicleOpen = true)"
+                                        @keydown.escape="vehicleOpen = false"
+                                        :disabled="!selectedCustomer"
+                                        :placeholder="
+                                            selectedCustomer
+                                                ? 'Search vehicle or plate...'
+                                                : 'Select a customer first'
+                                        "
+                                        autocomplete="off"
+                                        class="w-full rounded-lg border border-gray-200 bg-white py-2.5 pl-9 pr-10 text-sm focus:border-gray-400 focus:ring-2 focus:ring-gray-100 disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed"
+                                    >
+
+                                    <button
+                                        type="button"
+                                        x-show="vehicle"
+                                        x-cloak
+                                        @click="
+                                            vehicle = '';
+                                            vehicleSearch = '';
+                                        "
+                                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700"
+                                    >
+                                        <i class="ti ti-x"></i>
+                                    </button>
+
+                                    <i
+                                        x-show="!vehicle && selectedCustomer"
+                                        class="ti ti-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                                    ></i>
+
+                                </div>
+
+
+                                {{-- Vehicle Dropdown --}}
+                                <div
+                                    x-show="vehicleOpen && selectedCustomer"
+                                    x-cloak
+                                    @click.outside="vehicleOpen = false"
+                                    x-transition
+                                    class="absolute z-30 mt-1 w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg"
+                                >
+
+                                    <div class="max-h-60 overflow-y-auto">
+
+                                        {{-- No vehicles --}}
+                                        <template x-if="filteredVehicles.length === 0">
+
+                                            <div class="px-4 py-6 text-center">
+
+                                                <i class="ti ti-car-off text-2xl text-gray-300"></i>
+
+                                                <p class="mt-2 text-sm text-gray-500">
+                                                    No vehicles found.
+                                                </p>
+
+                                            </div>
+
+                                        </template>
+
+
+                                        {{-- Vehicles --}}
+                                        <template
+                                            x-for="vehicleItem in filteredVehicles"
+                                            :key="vehicleItem.id"
+                                        >
+
+                                            <button
+                                                type="button"
+                                                @click="selectVehicle(vehicleItem)"
+                                                class="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition"
+                                                :class="vehicle == vehicleItem.id ? 'bg-gray-50' : ''"
                                             >
-                                                {{ $v->make }} · {{ $v->plate_number }}
-                                            </option>
 
-                                        @endforeach
+                                                {{-- Vehicle Icon --}}
+                                                <div
+                                                    class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-600"
+                                                >
+                                                    <i class="ti ti-car"></i>
+                                                </div>
 
-                                    @endforeach
 
-                                </select>
+                                                {{-- Vehicle Info --}}
+                                                <div class="min-w-0 flex-1">
+
+                                                    <p
+                                                        class="text-sm font-medium text-gray-900"
+                                                        x-text="vehicleItem.make"
+                                                    ></p>
+
+                                                    <p
+                                                        class="text-xs text-gray-500"
+                                                        x-text="vehicleItem.plate"
+                                                    ></p>
+
+                                                </div>
+
+
+                                                {{-- Selected --}}
+                                                <i
+                                                    x-show="vehicle == vehicleItem.id"
+                                                    class="ti ti-check text-gray-700"
+                                                ></i>
+
+                                            </button>
+
+                                        </template>
+
+                                    </div>
+
+                                </div>
 
                             </div>
 

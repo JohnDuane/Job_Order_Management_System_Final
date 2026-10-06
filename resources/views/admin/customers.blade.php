@@ -5,14 +5,14 @@
         x-data="customerTable()"
     >
 
-        <div class="flex min-h-screen">
+        <div class="min-h-screen lg:flex">
 
             {{-- Admin Sidebar --}}
             <x-admin-sidebar />
 
 
             {{-- Main Content --}}
-            <main class="flex-1 min-w-0 p-6 sm:p-8">
+            <main class="min-w-0 flex-1 flex-col gap-6 p-4 sm:p-6 lg:p-8">
 
                 {{-- Header --}}
                 <div class="mb-6 flex items-start justify-between gap-4">
@@ -44,28 +44,49 @@
 
 
                 {{-- Search + Filter --}}
-                <div class="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center">
+                <form
+                    method="GET"
+                    action="{{ route('admin.customers') }}"
+                    class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center"
+                >
 
-                    {{-- Search --}}
+                    {{-- Search Input --}}
                     <div class="relative w-full sm:max-w-md">
 
                         <i
                             class="ti ti-search absolute left-3 top-1/2
-                                   -translate-y-1/2 text-gray-400"
+                                -translate-y-1/2 text-gray-400"
                         ></i>
 
                         <input
                             type="text"
-                            x-model="search"
+                            name="search"
+                            value="{{ $search }}"
                             placeholder="Search customers..."
                             class="w-full rounded-lg border border-gray-200
-                                   bg-white py-2.5 pl-9 pr-3 text-sm
-                                   text-gray-900 placeholder:text-gray-400
-                                   focus:border-gray-300 focus:outline-none
-                                   focus:ring-2 focus:ring-gray-100"
+                                bg-white py-2.5 pl-9 pr-3 text-sm
+                                text-gray-900 placeholder:text-gray-400
+                                focus:border-gray-300 focus:outline-none
+                                focus:ring-2 focus:ring-gray-100"
                         >
 
                     </div>
+
+
+                    {{-- Search Button --}}
+                    <button
+                        type="submit"
+                        class="inline-flex items-center justify-center gap-2
+                            rounded-lg bg-gray-900 px-4 py-2.5
+                            text-sm font-medium text-white
+                            transition hover:bg-gray-800"
+                    >
+
+                        <i class="ti ti-search"></i>
+
+                        Search
+
+                    </button>
 
 
                     {{-- Filter --}}
@@ -78,10 +99,10 @@
                             type="button"
                             @click="open = !open"
                             class="inline-flex w-full items-center justify-center
-                                   gap-2 rounded-lg border border-gray-200
-                                   bg-white px-3 py-2.5 text-sm text-gray-600
-                                   transition hover:bg-gray-50
-                                   sm:w-auto"
+                                gap-2 rounded-lg border border-gray-200
+                                bg-white px-3 py-2.5 text-sm text-gray-600
+                                transition hover:bg-gray-50
+                                sm:w-auto"
                         >
 
                             <i class="ti ti-filter text-base"></i>
@@ -101,16 +122,18 @@
                         {{-- Filter Dropdown --}}
                         <div
                             x-show="open"
+                            x-cloak
                             x-transition
                             @click.outside="open = false"
                             class="absolute left-0 z-30 mt-2 w-52
-                                   rounded-xl border border-gray-200
-                                   bg-white p-2 shadow-lg sm:left-auto sm:right-0"
+                                rounded-xl border border-gray-200
+                                bg-white p-2 shadow-lg
+                                sm:left-auto sm:right-0"
                         >
 
                             <p
                                 class="px-3 py-2 text-xs font-medium
-                                       uppercase tracking-wide text-gray-400"
+                                    uppercase tracking-wide text-gray-400"
                             >
                                 Sort customers
                             </p>
@@ -118,15 +141,12 @@
 
                             {{-- A-Z --}}
                             <button
-                                type="button"
-                                @click="
-                                    sort = 'az';
-                                    open = false;
-                                "
-                                class="flex w-full items-center gap-3 rounded-lg
-                                       px-3 py-2 text-sm text-gray-700
-                                       transition hover:bg-gray-50"
-                                :class="{ 'bg-gray-50': sort === 'az' }"
+                                type="submit"
+                                name="sort"
+                                value="az"
+                                class="flex w-full items-center gap-3
+                                    rounded-lg px-3 py-2 text-sm
+                                    text-gray-700 transition hover:bg-gray-50"
                             >
 
                                 <i
@@ -137,25 +157,23 @@
                                     A–Z
                                 </span>
 
-                                <i
-                                    x-show="sort === 'az'"
-                                    class="ti ti-check ml-auto text-sm text-gray-700"
-                                ></i>
+                                @if ($sort === 'az')
+                                    <i
+                                        class="ti ti-check ml-auto text-sm text-gray-700"
+                                    ></i>
+                                @endif
 
                             </button>
 
 
                             {{-- Z-A --}}
                             <button
-                                type="button"
-                                @click="
-                                    sort = 'za';
-                                    open = false;
-                                "
-                                class="flex w-full items-center gap-3 rounded-lg
-                                       px-3 py-2 text-sm text-gray-700
-                                       transition hover:bg-gray-50"
-                                :class="{ 'bg-gray-50': sort === 'za' }"
+                                type="submit"
+                                name="sort"
+                                value="za"
+                                class="flex w-full items-center gap-3
+                                    rounded-lg px-3 py-2 text-sm
+                                    text-gray-700 transition hover:bg-gray-50"
                             >
 
                                 <i
@@ -166,10 +184,11 @@
                                     Z–A
                                 </span>
 
-                                <i
-                                    x-show="sort === 'za'"
-                                    class="ti ti-check ml-auto text-sm text-gray-700"
-                                ></i>
+                                @if ($sort === 'za')
+                                    <i
+                                        class="ti ti-check ml-auto text-sm text-gray-700"
+                                    ></i>
+                                @endif
 
                             </button>
 
@@ -178,16 +197,11 @@
 
 
                             {{-- Reset --}}
-                            <button
-                                type="button"
-                                @click="
-                                    search = '';
-                                    sort = 'az';
-                                    open = false;
-                                "
-                                class="flex w-full items-center gap-3 rounded-lg
-                                       px-3 py-2 text-sm text-gray-500
-                                       transition hover:bg-gray-50"
+                            <a
+                                href="{{ route('admin.customers') }}"
+                                class="flex w-full items-center gap-3
+                                    rounded-lg px-3 py-2 text-sm
+                                    text-gray-500 transition hover:bg-gray-50"
                             >
 
                                 <i
@@ -196,13 +210,13 @@
 
                                 Reset
 
-                            </button>
+                            </a>
 
                         </div>
 
                     </div>
 
-                </div>
+                </form>
 
 
                 {{-- Customer Table --}}

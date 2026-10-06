@@ -2,14 +2,14 @@
 
     <div class="min-h-screen bg-white text-gray-900">
 
-        <div class="flex min-h-screen">
+        <div class="min-h-screen lg:flex">
 
             {{-- Sidebar --}}
             <x-mechanic-sidebar />
 
 
             {{-- Main Content --}}
-            <main class="flex-1 min-w-0 p-8">
+            <main class="min-w-0 flex-1 flex-col gap-6 p-4 sm:p-6 lg:p-8">
 
                 {{-- ========================================================= --}}
                 {{-- HEADER --}}

@@ -14,17 +14,66 @@ class CustomerController extends Controller
     /**
      * Display customers.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
-        $customers = Customer::with('vehicles')
-            ->orderBy('last_name')
-            ->orderBy('first_name')
-            ->paginate(5);
+    $search = trim($request->input('search', ''));
+    $sort = $request->input('sort', 'az');
 
-        return view('admin.customers', [
-            'customers' => $customers,
-        ]);
+    $query = Customer::with('vehicles');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Search
+    |--------------------------------------------------------------------------
+    */
+
+    if ($search !== '') {
+        $query->where(function ($q) use ($search) {
+
+            $q->where('first_name', 'like', "%{$search}%")
+              ->orWhere('middle_name', 'like', "%{$search}%")
+              ->orWhere('last_name', 'like', "%{$search}%")
+              ->orWhere('contact_number', 'like', "%{$search}%")
+              ->orWhere('address', 'like', "%{$search}%");
+
+        });
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Sort
+    |--------------------------------------------------------------------------
+    */
+
+    if ($sort === 'za') {
+
+        $query->orderBy('last_name', 'desc')
+              ->orderBy('first_name', 'desc');
+
+    } else {
+
+        $sort = 'az';
+
+        $query->orderBy('last_name', 'asc')
+              ->orderBy('first_name', 'asc');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Pagination
+    |--------------------------------------------------------------------------
+    */
+
+    $customers = $query
+        ->paginate(5)
+        ->withQueryString();
+
+    return view('admin.customers', [
+        'customers' => $customers,
+        'search' => $search,
+        'sort' => $sort,
+    ]);
+}
 
     /**
      * Show the add customer form.

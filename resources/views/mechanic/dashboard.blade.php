@@ -2,7 +2,7 @@
 
     <div class="min-h-screen bg-white text-gray-900">
 
-        <div class="flex min-h-screen">
+        <div class="min-h-screen lg:flex">
 
             {{-- Mechanic Sidebar --}}
             <x-mechanic-sidebar />
@@ -228,7 +228,7 @@
                                 </p>
 
                                 <p class="mt-1 text-xs text-gray-500">
-                                    Completed job orders
+                                    Job Order Status Activity
                                 </p>
 
                             </div>
@@ -779,230 +779,389 @@
 
     <script>
 
-        document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () {
 
-            /*
-            |--------------------------------------------------------------------------
-            | Job Status Chart
-            |--------------------------------------------------------------------------
-            */
+    /*
+    |--------------------------------------------------------------------------
+    | Job Status Chart
+    |--------------------------------------------------------------------------
+    */
 
-            const statusCanvas = document.getElementById('jobStatusChart');
+    const statusCanvas = document.getElementById('jobStatusChart');
 
-            if (statusCanvas) {
+    if (statusCanvas) {
 
-                new Chart(statusCanvas, {
+        new Chart(statusCanvas, {
 
-                    type: 'doughnut',
+            type: 'doughnut',
 
-                    data: {
+            data: {
 
-                        labels: [
-                            'Assigned',
-                            'In Progress',
-                            'Completed',
-                            'Needs Revision'
-                        ],
+                labels: [
+                    'Assigned',
+                    'In Progress',
+                    'Completed',
+                    'Needs Revision'
+                ],
 
-                        datasets: [{
+                datasets: [{
 
-                            data: [
+                    data: [
 
-                                {{ $recentJobs->where('status', 'assigned')->count() }},
+                        {{ $jobStatusData['assigned'] ?? 0 }},
 
-                                {{ $recentJobs->where('status', 'in_progress')->count() }},
+                        {{ $jobStatusData['in_progress'] ?? 0 }},
 
-                                {{ $recentJobs->where('status', 'completed')->count() }},
+                        {{ $jobStatusData['completed'] ?? 0 }},
 
-                                {{
-                                    \App\Models\JobOrder::where('created_by', auth()->id())
-                                        ->where('status', 'needs_revision')
-                                        ->count()
-                                }}
+                        {{ $jobStatusData['needs_revision'] ?? 0 }}
 
-                            ],
+                    ],
 
-                            backgroundColor: [
-                                '#3b82f6',
-                                '#f59e0b',
-                                '#22c55e',
-                                '#ef4444'
-                            ],
+                    backgroundColor: [
+                        '#3b82f6',
+                        '#f59e0b',
+                        '#22c55e',
+                        '#ef4444'
+                    ],
 
-                            borderWidth: 0
+                    borderWidth: 0
 
-                        }]
+                }]
 
-                    },
+            },
 
-                    options: {
+            options: {
 
-                        responsive: true,
+                responsive: true,
 
-                        maintainAspectRatio: false,
+                maintainAspectRatio: false,
 
-                        cutout: '72%',
+                cutout: '72%',
 
-                        plugins: {
+                plugins: {
 
-                            legend: {
+                    legend: {
 
-                                position: 'bottom',
+                        position: 'bottom',
 
-                                labels: {
+                        labels: {
 
-                                    usePointStyle: true,
+                            usePointStyle: true,
 
-                                    pointStyle: 'circle',
+                            pointStyle: 'circle',
 
-                                    padding: 16,
+                            padding: 16,
 
-                                    font: {
-                                        size: 11
-                                    }
-
-                                }
-
+                            font: {
+                                size: 11
                             }
 
                         }
 
                     }
 
-                });
-
-            }
-
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Activity Chart
-            |--------------------------------------------------------------------------
-            */
-
-            const activityCanvas = document.getElementById('activityChart');
-
-            if (activityCanvas) {
-
-                new Chart(activityCanvas, {
-
-                    type: 'line',
-
-                    data: {
-
-                        labels: [
-                            'Apr',
-                            'May',
-                            'Jun',
-                            'Jul',
-                            'Aug',
-                            'Sep'
-                        ],
-
-                        datasets: [{
-
-                            label: 'Completed jobs',
-
-                            data: [
-                                4,
-                                7,
-                                5,
-                                9,
-                                8,
-                                {{ $jobCountYear > 0 ? min($jobCountYear, 12) : 0 }}
-                            ],
-
-                            borderColor: '#111827',
-
-                            backgroundColor: 'rgba(17, 24, 39, 0.05)',
-
-                            borderWidth: 2,
-
-                            tension: 0.35,
-
-                            fill: true,
-
-                            pointRadius: 3,
-
-                            pointHoverRadius: 5
-
-                        }]
-
-                    },
-
-                    options: {
-
-                        responsive: true,
-
-                        maintainAspectRatio: false,
-
-                        interaction: {
-
-                            intersect: false,
-
-                            mode: 'index'
-
-                        },
-
-                        plugins: {
-
-                            legend: {
-                                display: false
-                            }
-
-                        },
-
-                        scales: {
-
-                            x: {
-
-                                grid: {
-                                    display: false
-                                },
-
-                                ticks: {
-                                    font: {
-                                        size: 11
-                                    },
-
-                                    color: '#9ca3af'
-                                }
-
-                            },
-
-                            y: {
-
-                                beginAtZero: true,
-
-                                ticks: {
-
-                                    precision: 0,
-
-                                    font: {
-                                        size: 11
-                                    },
-
-                                    color: '#9ca3af'
-
-                                },
-
-                                grid: {
-                                    color: '#f3f4f6'
-                                }
-
-                            }
-
-                        }
-
-                    }
-
-                });
+                }
 
             }
 
         });
 
-    </script>
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Work Activity Chart
+    |--------------------------------------------------------------------------
+    */
+
+    const activityCanvas = document.getElementById('activityChart');
+
+    if (activityCanvas) {
+
+        const labels = @json($statusActivityLabels);
+
+        const completedData = @json($completedActivity);
+
+        const pendingData = @json($pendingActivity);
+
+        const revisionData = @json($revisionActivity);
+
+
+        const monthLabels = @json($activityMonthLabels);
+
+        const monthData = @json($activityMonthData);
+
+
+        const weekLabels = @json($activityWeekLabels);
+
+        const weekData = @json($activityWeekData);
+
+
+        const activityChart = new Chart(activityCanvas, {
+
+            type: 'line',
+
+            data: {
+
+                labels: labels,
+
+                datasets: [
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | GREEN — COMPLETED
+                    |--------------------------------------------------------------------------
+                    */
+
+                    {
+
+                        label: 'Completed',
+
+                        data: completedData,
+
+                        borderColor: '#22c55e',
+
+                        backgroundColor: 'rgba(34, 197, 94, 0.08)',
+
+                        borderWidth: 2,
+
+                        tension: 0.35,
+
+                        fill: false,
+
+                        pointRadius: 3,
+
+                        pointHoverRadius: 5
+
+                    },
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | YELLOW — PENDING APPROVAL
+                    |--------------------------------------------------------------------------
+                    */
+
+                    {
+
+                        label: 'Pending approval',
+
+                        data: pendingData,
+
+                        borderColor: '#eab308',
+
+                        backgroundColor: 'rgba(234, 179, 8, 0.08)',
+
+                        borderWidth: 2,
+
+                        tension: 0.35,
+
+                        fill: false,
+
+                        pointRadius: 3,
+
+                        pointHoverRadius: 5
+
+                    },
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | RED — REJECTED / NEEDS REVISION
+                    |--------------------------------------------------------------------------
+                    */
+
+                    {
+
+                        label: 'Rejected / Needs revision',
+
+                        data: revisionData,
+
+                        borderColor: '#ef4444',
+
+                        backgroundColor: 'rgba(239, 68, 68, 0.08)',
+
+                        borderWidth: 2,
+
+                        tension: 0.35,
+
+                        fill: false,
+
+                        pointRadius: 3,
+
+                        pointHoverRadius: 5
+
+                    }
+
+                ]
+
+            },
+
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                interaction: {
+
+                    intersect: false,
+
+                    mode: 'index'
+
+                },
+
+                plugins: {
+
+                    legend: {
+
+                        display: true,
+
+                        position: 'bottom',
+
+                        labels: {
+
+                            usePointStyle: true,
+
+                            pointStyle: 'circle',
+
+                            padding: 16,
+
+                            font: {
+                                size: 11
+                            }
+
+                        }
+
+                    }
+
+                },
+
+
+                scales: {
+
+                    x: {
+
+                        grid: {
+                            display: false
+                        },
+
+                        ticks: {
+
+                            font: {
+                                size: 11
+                            },
+
+                            color: '#9ca3af'
+
+                        }
+
+                    },
+
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        ticks: {
+
+                            precision: 0,
+
+                            color: '#9ca3af',
+
+                            font: {
+                                size: 11
+                            }
+
+                        },
+
+                        grid: {
+
+                            color: '#f3f4f6'
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        });
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | PERIOD SELECTOR
+        |--------------------------------------------------------------------------
+        */
+
+        const activityPeriod =
+            document.getElementById('activityPeriod');
+
+
+        if (activityPeriod) {
+
+            activityPeriod.addEventListener('change', function () {
+
+                /*
+                |--------------------------------------------------------------
+                | LAST 6 WEEKS
+                |--------------------------------------------------------------
+                */
+
+                if (this.value === 'weeks') {
+
+                    activityChart.data.labels = weekLabels;
+
+                    activityChart.data.datasets[0].data = weekData;
+
+                    /*
+                    | No weekly pending/revision arrays currently exist
+                    | in the controller, so hide those lines.
+                    */
+
+                    activityChart.data.datasets[1].data = [];
+
+                    activityChart.data.datasets[2].data = [];
+
+
+                /*
+                |--------------------------------------------------------------
+                | LAST 6 MONTHS
+                |--------------------------------------------------------------
+                */
+
+                } else {
+
+                    activityChart.data.labels = monthLabels;
+
+                    activityChart.data.datasets[0].data = monthData;
+
+                    /*
+                    | Restore daily status lines when switching back.
+                    */
+
+                    activityChart.data.datasets[1].data = pendingData;
+
+                    activityChart.data.datasets[2].data = revisionData;
+
+                }
+
+
+                activityChart.update();
+
+            });
+
+        }
+
+    }
+
+});
+
+</script>
 
 </x-app-layout>

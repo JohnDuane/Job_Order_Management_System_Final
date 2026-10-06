@@ -2,11 +2,11 @@
 
     <div class="min-h-screen bg-white text-gray-900">
 
-        <div class="flex min-h-screen">
+        <div class="min-h-screen lg:flex">
 
             <x-supervisor-sidebar />
 
-            <main class="flex-1 min-w-0 p-8">
+            <main class="min-w-0 flex-1 flex-col gap-6 p-4 sm:p-6 lg:p-8">
 
                 <div class="mb-6">
                     <h1 class="text-2xl font-medium">Pending approvals</h1>

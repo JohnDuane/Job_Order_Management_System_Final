@@ -2,11 +2,11 @@
 
     <div class="min-h-screen bg-white text-gray-900">
 
-        <div class="flex min-h-screen">
+        <div class="min-h-screen lg:flex">
 
             <x-supervisor-sidebar />
 
-            <main class="flex-1 min-w-0 p-6 sm:p-8">
+            <main class="min-w-0 flex-1 flex-col gap-6 p-4 sm:p-6 lg:p-8">
 
                 {{-- Header --}}
                 <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
@@ -510,16 +510,7 @@
 
         document.addEventListener('DOMContentLoaded', function () {
 
-            /*
-             * Job Order Activity Chart
-             *
-             * These are currently sample values.
-             * Replace them with values from your controller
-             * once your monthly statistics are available.
-             */
-
-            const activityCtx =
-                document.getElementById('jobActivityChart');
+            const activityCtx = document.getElementById('jobActivityChart');
 
             new Chart(activityCtx, {
 
@@ -527,33 +518,21 @@
 
                 data: {
 
-                    labels: [
-                        'Apr',
-                        'May',
-                        'Jun',
-                        'Jul',
-                        'Aug',
-                        'Sep'
-                    ],
+                    labels: @json($jobActivityLabels),
 
                     datasets: [{
 
-                        label: 'Job orders',
+                        label: 'Job Orders',
 
-                        data: [
-                            18,
-                            25,
-                            21,
-                            32,
-                            28,
-                            {{ $jobCountMonth }}
-                        ],
+                        data: @json($jobActivityData),
 
                         borderWidth: 2,
 
                         tension: 0.35,
 
-                        pointRadius: 3,
+                        pointRadius: 4,
+
+                        pointHoverRadius: 6,
 
                         fill: false
 
@@ -571,6 +550,18 @@
 
                         legend: {
                             display: false
+                        },
+
+                        tooltip: {
+
+                            callbacks: {
+
+                                label: function(context) {
+                                    return ' ' + context.parsed.y + ' job orders';
+                                }
+
+                            }
+
                         }
 
                     },
