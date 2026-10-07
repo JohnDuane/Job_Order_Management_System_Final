@@ -6,7 +6,7 @@
 
         <x-admin-sidebar />
 
-        <main class="min-w-0 flex-1 flex-col gap-6 p-4 sm:p-6 lg:p-8">
+        <main class="min-w-0 flex-1 flex-col gap-6 p-4 space-y-4 sm:p-6 lg:p-8">
 
                 {{-- Header --}}
                 <div class="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">

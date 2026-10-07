@@ -286,7 +286,10 @@ class JobOrderController extends Controller
         if ($jobOrder->status !== 'pending_approval') {
             return back()->with('error', $jobOrder->code . ' is no longer awaiting approval.');
         }
-        $data = $request->validate(['remarks' => ['nullable', 'string', 'max:2000']]);
+
+        $data = $request->validate([
+            'remarks' => ['nullable', 'string', 'max:2000'],
+        ]);
 
         DB::transaction(function () use ($jobOrder, $data) {
             JobOrderApproval::create([
@@ -296,9 +299,17 @@ class JobOrderController extends Controller
                 'remarks' => $data['remarks'] ?? null,
                 'action_date' => now()->toDateString(),
             ]);
-            $jobOrder->update(['status' => 'approved', 'remarks' => $data['remarks'] ?? $jobOrder->remarks]);
+
+            $jobOrder->update([
+                'status' => 'approved',
+                'remarks' => $data['remarks'] ?? $jobOrder->remarks,
+            ]);
         });
-        return back()->with('success', $jobOrder->code . ' was approved.');
+
+        return back()->with('approval_success', [
+            'job_order_id' => $jobOrder->job_order_id,
+            'code' => $jobOrder->code,
+        ]);
     }
 
     public function reject(Request $request, JobOrder $jobOrder): RedirectResponse
@@ -323,6 +334,8 @@ class JobOrderController extends Controller
 
     public function assignmentPage(Request $request): View
     {
+        $selectedJobOrderId = $request->integer('job_order_id');
+
         $query = JobOrder::with([
             'customer',
             'vehicle',
@@ -333,6 +346,22 @@ class JobOrderController extends Controller
 
         // Search + status filter
         $this->applyFilters($query, $request);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Put the recently approved job first
+        |--------------------------------------------------------------------------
+        |
+        | When coming from the "Assign mechanic" button after approval,
+        | the selected job order should appear on the first page.
+        |
+        */
+        if ($selectedJobOrderId) {
+            $query->orderByRaw(
+                'job_order_id = ? DESC',
+                [$selectedJobOrderId]
+            );
+        }
 
         // Sorting
         if ($request->input('sort') === 'oldest') {
@@ -350,7 +379,11 @@ class JobOrderController extends Controller
             ->orderBy('staff_last')
             ->get();
 
-        return view('supervisor.assign-mechanic', compact('jobs', 'mechanics'));
+        return view('supervisor.assign-mechanic', compact(
+            'jobs',
+            'mechanics',
+            'selectedJobOrderId'
+        ));
     }
 
     public function assign(Request $request, JobOrder $jobOrder): RedirectResponse

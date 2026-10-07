@@ -11,9 +11,9 @@
             {{-- Main Content --}}
             <main class="min-w-0 flex-1 flex-col gap-6 p-4 sm:p-6 lg:p-8">
 
-                {{-- ========================================================= --}}
-                {{-- HEADER --}}
-                {{-- ========================================================= --}}
+                {{--========================================================= --}}
+                {{--HEADER --}}
+                {{--========================================================= --}}
 
                 <div class="flex items-start justify-between mb-6">
 
@@ -125,10 +125,13 @@
                         {{-- ================================================= --}}
 
                         <div
-                            x-data="{ viewOpen: false }"
+                            x-data="{
+                                viewOpen: false,
+                                startOpen: false
+                            }"
                             class="rounded-xl border border-gray-200
-                                   bg-white p-5
-                                   transition hover:border-gray-300"
+                                bg-white p-5
+                                transition hover:border-gray-300"
                         >
 
                             <div
@@ -284,30 +287,190 @@
                                     {{-- Start --}}
                                     @if ($job->status === 'assigned')
 
-                                        <form
-                                            method="POST"
-                                            action="{{ route('mechanic.job-orders.start', $job) }}"
+                                        <button
+                                            type="button"
+                                            @click="startOpen = true"
+                                            class="inline-flex items-center gap-1.5
+                                                rounded-lg bg-gray-900
+                                                px-3 py-2 text-sm
+                                                font-medium text-white
+                                                transition hover:bg-gray-800"
                                         >
 
-                                            @csrf
+                                            <i class="ti ti-player-play"></i>
 
-                                            <button
-                                                type="submit"
-                                                class="inline-flex items-center gap-1.5
-                                                       rounded-lg bg-gray-900
-                                                       px-3 py-2 text-sm
-                                                       font-medium text-white
-                                                       transition hover:bg-gray-800"
-                                                onclick="return confirm('Start this job order?')"
+                                            Start
+
+                                        </button>
+
+                                        {{-- ================================================= --}}
+                                        {{-- START JOB ORDER CONFIRMATION MODAL --}}
+                                        {{-- ================================================= --}}
+
+                                        <div
+                                            x-show="startOpen"
+                                            x-cloak
+                                            x-transition.opacity
+                                            @keydown.escape.window="startOpen = false"
+                                            class="fixed inset-0 z-[60] flex items-center
+                                                justify-center bg-black/50 px-4 py-6"
+                                        >
+
+                                            <div
+                                                x-show="startOpen"
+                                                x-transition
+                                                @click.outside="startOpen = false"
+                                                class="w-full max-w-md rounded-2xl bg-white shadow-2xl"
                                             >
 
-                                                <i class="ti ti-player-play"></i>
+                                                {{-- ========================================= --}}
+                                                {{-- MODAL HEADER --}}
+                                                {{-- ========================================= --}}
 
-                                                Start
+                                                <div class="px-6 pt-6">
 
-                                            </button>
+                                                    <div class="flex items-start gap-4">
 
-                                        </form>
+                                                        <div
+                                                            class="flex h-11 w-11 shrink-0
+                                                                items-center justify-center
+                                                                rounded-full bg-gray-100"
+                                                        >
+
+                                                            <i
+                                                                class="ti ti-player-play
+                                                                    text-xl text-gray-700"
+                                                            ></i>
+
+                                                        </div>
+
+
+                                                        <div class="min-w-0">
+
+                                                            <h2
+                                                                class="text-lg font-semibold
+                                                                    text-gray-900"
+                                                            >
+                                                                Start job order?
+                                                            </h2>
+
+                                                            <p class="mt-1 text-sm leading-5 text-gray-500">
+                                                                Are you sure you want to start
+                                                                <span class="font-medium text-gray-700">
+                                                                    {{ $job->code }}
+                                                                </span>
+                                                                ?
+                                                            </p>
+
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+
+                                                {{-- ========================================= --}}
+                                                {{-- MODAL BODY --}}
+                                                {{-- ========================================= --}}
+
+                                                <div class="px-6 py-5">
+
+                                                    <div
+                                                        class="rounded-xl border border-gray-200
+                                                            bg-gray-50 px-4 py-3"
+                                                    >
+
+                                                        <p class="text-xs text-gray-400">
+                                                            Customer
+                                                        </p>
+
+                                                        <p class="mt-1 text-sm font-medium text-gray-900">
+                                                            {{ $job->customer->first_name }}
+                                                            {{ $job->customer->last_name }}
+                                                        </p>
+
+
+                                                        <p class="mt-2 text-xs text-gray-400">
+                                                            Vehicle
+                                                        </p>
+
+                                                        <p class="mt-1 text-sm text-gray-700">
+                                                            {{ $job->vehicle->make }}
+
+                                                            @if ($job->vehicle->model)
+                                                                {{ $job->vehicle->model }}
+                                                            @endif
+
+                                                            ·
+
+                                                            {{ $job->vehicle->plate_number }}
+                                                        </p>
+
+                                                    </div>
+
+
+                                                    <p class="mt-4 text-sm leading-6 text-gray-500">
+                                                        Once started, this job order will be marked as
+                                                        <span class="font-medium text-gray-700">
+                                                            In progress
+                                                        </span>.
+                                                    </p>
+
+                                                </div>
+
+
+                                                {{-- ========================================= --}}
+                                                {{-- MODAL FOOTER --}}
+                                                {{-- ========================================= --}}
+
+                                                <div
+                                                    class="flex items-center justify-end gap-2
+                                                        border-t border-gray-100
+                                                        px-6 py-4"
+                                                >
+
+                                                    <button
+                                                        type="button"
+                                                        @click="startOpen = false"
+                                                        class="rounded-lg border
+                                                            border-gray-200
+                                                            px-4 py-2.5 text-sm
+                                                            font-medium text-gray-700
+                                                            transition hover:bg-gray-50"
+                                                    >
+                                                        Cancel
+                                                    </button>
+
+
+                                                    <form
+                                                        method="POST"
+                                                        action="{{ route('mechanic.job-orders.start', $job) }}"
+                                                    >
+
+                                                        @csrf
+
+                                                        <button
+                                                            type="submit"
+                                                            class="inline-flex items-center gap-2
+                                                                rounded-lg bg-gray-900
+                                                                px-4 py-2.5 text-sm
+                                                                font-medium text-white
+                                                                transition hover:bg-gray-800"
+                                                        >
+
+                                                            <i class="ti ti-player-play"></i>
+
+                                                            Start job order
+
+                                                        </button>
+
+                                                    </form>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
 
                                     @elseif($job->status === 'in_progress')
 

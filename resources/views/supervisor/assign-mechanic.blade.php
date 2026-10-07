@@ -200,7 +200,9 @@
 
                         <div
                             class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
-                            x-data="{ open: false }"
+                            x-data="{
+                                open: {{ $selectedJobOrderId && (int) $selectedJobOrderId === (int) $job->job_order_id ? 'true' : 'false' }}
+                            }"
                         >
 
                             <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
@@ -299,10 +301,13 @@
                             <div
                                 x-show="open"
                                 x-cloak
+                                x-transition.opacity
                                 class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
                             >
 
                                 <div
+                                    x-show="open"
+                                    x-transition
                                     @click.outside="open=false"
                                     class="w-full max-w-lg rounded-2xl bg-white shadow-xl"
                                 >

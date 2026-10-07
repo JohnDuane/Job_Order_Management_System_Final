@@ -203,30 +203,131 @@
 
 
                                     {{-- APPROVE --}}
-                                    <form
-                                        method="POST"
-                                        action="{{ route('supervisor.job-orders.approve', $job) }}"
+                                    <div
+                                        x-data="{ open: false }"
                                     >
-                                        @csrf
-
-                                        <input
-                                            type="hidden"
-                                            name="remarks"
-                                            value="Approved by supervisor"
-                                        >
-
                                         <button
-                                            type="submit"
+                                            type="button"
+                                            @click="open = true"
                                             class="inline-flex items-center gap-1.5 rounded-lg
                                                 bg-green-600 px-3 py-2 text-sm
                                                 font-medium text-white
                                                 transition hover:bg-green-700"
-                                            onclick="return confirm('Approve this job order?')"
                                         >
                                             <i class="ti ti-check"></i>
                                             Approve
                                         </button>
-                                    </form>
+
+                                        {{-- APPROVE CONFIRMATION MODAL --}}
+                                        <div
+                                            x-show="open"
+                                            x-cloak
+                                            x-transition.opacity
+                                            class="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 p-4"
+                                        >
+
+                                            <div
+                                                x-show="open"
+                                                x-transition
+                                                @click.outside="open = false"
+                                                class="w-full max-w-md rounded-2xl bg-white shadow-2xl"
+                                            >
+
+                                                {{-- Header --}}
+                                                <div class="flex items-center justify-between border-b border-gray-100 px-6 py-5">
+
+                                                    <div>
+                                                        <h3 class="text-lg font-semibold text-gray-900">
+                                                            Approve job order
+                                                        </h3>
+
+                                                        <p class="mt-1 text-sm text-gray-500">
+                                                            Are you sure you want to approve
+                                                            <span class="font-medium text-gray-700">
+                                                                {{ $job->code }}
+                                                            </span>?
+                                                        </p>
+                                                    </div>
+
+                                                    <button
+                                                        type="button"
+                                                        @click="open = false"
+                                                        class="rounded-lg p-1.5 text-gray-400
+                                                            hover:bg-gray-100 hover:text-gray-700"
+                                                    >
+                                                        <i class="ti ti-x text-xl"></i>
+                                                    </button>
+
+                                                </div>
+
+                                                {{-- Body --}}
+                                                <div class="px-6 py-5">
+
+                                                    <div class="flex gap-3 rounded-xl bg-green-50 p-4">
+
+                                                        <div
+                                                            class="flex h-10 w-10 shrink-0 items-center justify-center
+                                                                rounded-full bg-green-100"
+                                                        >
+                                                            <i class="ti ti-check text-xl text-green-600"></i>
+                                                        </div>
+
+                                                        <div>
+                                                            <p class="text-sm font-medium text-green-800">
+                                                                Ready for approval
+                                                            </p>
+
+                                                            <p class="mt-1 text-sm leading-5 text-green-700">
+                                                                Approving this job order will allow it to be assigned
+                                                                to a mechanic.
+                                                            </p>
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+                                                {{-- Footer --}}
+                                                <div class="flex justify-end gap-2 border-t border-gray-100 px-6 py-4">
+
+                                                    <button
+                                                        type="button"
+                                                        @click="open = false"
+                                                        class="rounded-lg border border-gray-200
+                                                            px-4 py-2.5 text-sm font-medium
+                                                            text-gray-700 hover:bg-gray-50"
+                                                    >
+                                                        Cancel
+                                                    </button>
+
+                                                    <form
+                                                        method="POST"
+                                                        action="{{ route('supervisor.job-orders.approve', $job) }}"
+                                                    >
+                                                        @csrf
+
+                                                        <input
+                                                            type="hidden"
+                                                            name="remarks"
+                                                            value="Approved by supervisor"
+                                                        >
+
+                                                        <button
+                                                            type="submit"
+                                                            class="rounded-lg bg-green-600
+                                                                px-4 py-2.5 text-sm font-medium
+                                                                text-white hover:bg-green-700"
+                                                        >
+                                                            Approve job order
+                                                        </button>
+                                                    </form>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                    </div>
 
 
                                     {{-- NEEDS REVISION --}}
@@ -1016,6 +1117,143 @@
                     @endforelse
                 </div>
                 <div class="mt-5">{{ $jobs->links() }}</div>
+
+
+                {{-- ========================================================= --}}
+                {{-- APPROVAL SUCCESS / ASSIGN MECHANIC MODAL --}}
+                {{-- ========================================================= --}}
+
+                <div
+                    x-data="{
+                        open: {{ session()->has('approval_success') ? 'true' : 'false' }}
+                    }"
+                    x-show="open"
+                    x-cloak
+                    x-transition.opacity
+                    @keydown.escape.window="open = false"
+                    class="fixed inset-0 z-[80] flex items-center justify-center bg-black/40 p-4"
+                >
+
+                    <div
+                        x-show="open"
+                        x-transition
+                        @click.outside="open = false"
+                        class="w-full max-w-md rounded-2xl bg-white shadow-2xl"
+                    >
+
+                        {{-- HEADER --}}
+                        <div class="flex items-start justify-between border-b border-gray-100 px-6 py-5">
+
+                            <div class="flex items-center gap-3">
+
+                                <div
+                                    class="flex h-11 w-11 shrink-0 items-center justify-center
+                                        rounded-full bg-green-100"
+                                >
+                                    <i class="ti ti-check text-2xl text-green-600"></i>
+                                </div>
+
+                                <div>
+
+                                    <h3 class="text-lg font-semibold text-gray-900">
+                                        Job order approved
+                                    </h3>
+
+                                    @if(session('approval_success'))
+                                        <p class="mt-1 text-sm text-gray-500">
+                                            {{ session('approval_success.code') }}
+                                            has been approved successfully.
+                                        </p>
+                                    @endif
+
+                                </div>
+
+                            </div>
+
+                            <button
+                                type="button"
+                                @click="open = false"
+                                class="rounded-lg p-1.5 text-gray-400
+                                    transition hover:bg-gray-100 hover:text-gray-700"
+                            >
+                                <i class="ti ti-x text-xl"></i>
+                            </button>
+
+                        </div>
+
+
+                        {{-- BODY --}}
+                        <div class="px-6 py-6">
+
+                            <div class="rounded-xl bg-gray-50 p-4">
+
+                                <div class="flex items-start gap-3">
+
+                                    <i class="ti ti-user-plus mt-0.5 text-xl text-gray-500"></i>
+
+                                    <div>
+
+                                        <p class="text-sm font-medium text-gray-900">
+                                            Would you like to assign a mechanic?
+                                        </p>
+
+                                        <p class="mt-1 text-sm leading-5 text-gray-500">
+                                            This approved job order is now ready to be assigned
+                                            to a mechanic.
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        {{-- FOOTER --}}
+                        <div class="flex justify-end gap-2 border-t border-gray-100 px-6 py-4">
+
+                            <button
+                                type="button"
+                                @click="open = false"
+                                class="rounded-lg border border-gray-200
+                                    px-4 py-2.5 text-sm font-medium
+                                    text-gray-700 transition hover:bg-gray-50"
+                            >
+                                Not now
+                            </button>
+
+
+                            @if(session('approval_success'))
+
+                                <a
+                                    href="{{ route(
+                                        'supervisor.assign-mechanic',
+                                        ['job_order_id' => session('approval_success.job_order_id')]
+                                    ) }}"
+                                    class="inline-flex items-center gap-1.5
+                                        rounded-lg bg-gray-900
+                                        px-4 py-2.5 text-sm font-medium
+                                        text-white transition hover:bg-gray-800"
+                                >
+                                    <i class="ti ti-user-plus"></i>
+                                    Assign mechanic
+                                </a>
+
+                            @endif
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+
+
+
             </main>
         </div>
     </div>
