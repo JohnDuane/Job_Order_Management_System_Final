@@ -108,8 +108,9 @@
             class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left hover:bg-[#f5d1d1]"
         >
 
-            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200">
-                <i class="ti ti-user text-xl text-gray-600"></i>
+            
+            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 text-sm font-bold text-gray-700">
+                {{ auth()->user()->initials() }}
             </div>
 
             <div class="min-w-0 flex-1">
@@ -359,8 +360,8 @@
                 class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left hover:bg-white"
             >
 
-                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200">
-                    <i class="ti ti-user text-xl text-gray-600"></i>
+                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 text-sm font-bold text-gray-700">
+                    {{ auth()->user()->initials() }}
                 </div>
 
                 <div class="min-w-0 flex-1">

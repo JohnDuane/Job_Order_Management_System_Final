@@ -15,7 +15,7 @@ Route::get('/dashboard', function () {
         'admin' => redirect()->route('admin.dashboard'),
         'supervisor' => redirect()->route('supervisor.dashboard'),
         'mechanic' => redirect()->route('mechanic.dashboard'),
-        default => abort(403),
+        default => redirect()->route('dashboard'),
     };
 })->middleware(['auth', 'verified'])->name('dashboard');
 

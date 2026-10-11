@@ -44,6 +44,15 @@
                         class="w-full max-w-md rounded-lg border px-3 py-2.5 text-sm"
                     >
 
+
+                    <input
+                        type="date"
+                        name="date_issued"
+                        value="{{ request('date_issued') }}"
+                        aria-label="Filter by date issued"
+                        class="rounded-lg border px-3 py-2.5 text-sm"
+                    />
+
                     <select
                         name="status"
                         class="rounded-lg border px-3 py-2.5 text-sm"
