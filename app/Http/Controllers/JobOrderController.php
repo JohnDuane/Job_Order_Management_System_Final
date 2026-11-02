@@ -210,9 +210,7 @@ class JobOrderController extends Controller
         ]);
 
         /*
-        |--------------------------------------------------------------------------
         | Search
-        |--------------------------------------------------------------------------
         */
 
         $search = trim((string) $request->input('search'));
@@ -245,9 +243,7 @@ class JobOrderController extends Controller
         }
 
         /*
-        |--------------------------------------------------------------------------
         | Decision Filter
-        |--------------------------------------------------------------------------
         */
 
         $status = $request->input('status');
@@ -257,9 +253,7 @@ class JobOrderController extends Controller
         }
 
         /*
-        |--------------------------------------------------------------------------
         | Sorting
-        |--------------------------------------------------------------------------
         */
 
         if ($request->input('sort') === 'oldest') {
@@ -269,9 +263,7 @@ class JobOrderController extends Controller
         }
 
         /*
-        |--------------------------------------------------------------------------
         | Pagination
-        |--------------------------------------------------------------------------
         */
 
         $approvals = $query
@@ -837,5 +829,18 @@ class JobOrderController extends Controller
         if ($status !== null && $status !== '') {
             $query->where('status', $status);
         }
+
+
+        // Filter by job order date issued
+        $dateIssued = $request->input('date_issued');
+
+        if ($dateIssued !== null && $dateIssued !== '') {
+            $request->validate([
+                'date_issued' => ['nullable', 'date_format:Y-m-d'],
+            ]);
+
+            $query->whereDate('date_issued', $dateIssued);
+        }
+
     }
 }

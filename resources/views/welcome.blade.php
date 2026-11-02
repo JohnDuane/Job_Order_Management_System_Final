@@ -102,11 +102,6 @@
 
     <section class="relative overflow-hidden border-b border-gray-200">
 
-        {{-- Decorative red accent --}}
-        <div class="absolute -right-32 -top-32 h-80 w-80 rounded-full bg-red-50"></div>
-
-        <div class="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-red-50"></div>
-
 
         <div class="relative mx-auto grid max-w-7xl items-center gap-14 px-5 py-20 lg:grid-cols-2 lg:px-8 lg:py-28">
 
@@ -118,21 +113,16 @@
 
 
                 <h1 class="max-w-2xl text-4xl font-semibold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
-
-                    Reliable care for
-                    <span class="text-red-600">
-                        every road.
-                    </span>
-
+                    BSA Auto 
+                    <span class="block text-red-600"> Repair Shop </span>
                 </h1>
 
 
-                <p class="mt-6 max-w-xl text-base leading-7 text-gray-500">
 
+                <p class="mt-6 max-w-xl text-base leading-7 text-gray-500">
                     Professional vehicle repair and maintenance
                     services for cars, trucks, SUVs, and other
-                    vehicles at BSA Auto Repair Shop.
-
+                    vehicles since 2016.
                 </p>
 
 
@@ -164,62 +154,6 @@
 
                 </div>
 
-
-                {{-- Small trust information --}}
-                <div class="mt-8 flex flex-wrap items-center gap-6">
-
-                    <div class="flex items-center gap-2">
-
-                        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50">
-
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 2.994v2.25m10.5-2.25v2.25m-14.252 13.5V7.491a2.25 2.25 0 0 1 2.25-2.25h13.5a2.25 2.25 0 0 1 2.25 2.25v11.251m-18 0a2.25 2.25 0 0 0 2.25 2.25h13.5a2.25 2.25 0 0 0 2.25-2.25m-18 0v-7.5a2.25 2.25 0 0 1 2.25-2.25h13.5a2.25 2.25 0 0 1 2.25 2.25v7.5m-6.75-6h2.25m-9 2.25h4.5m.002-2.25h.005v.006H12v-.006Zm-.001 4.5h.006v.006h-.006v-.005Zm-2.25.001h.005v.006H9.75v-.006Zm-2.25 0h.005v.005h-.006v-.005Zm6.75-2.247h.005v.005h-.005v-.005Zm0 2.247h.006v.006h-.006v-.006Zm2.25-2.248h.006V15H16.5v-.005Z" />
-                            </svg>
-
-                        </div>
-
-                        <div>
-
-                            <p class="text-sm font-medium">
-                                Since 2016
-                            </p>
-
-                            <p class="text-[11px] text-gray-400">
-                                Serving customers
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="h-8 w-px bg-gray-200"></div>
-
-
-                    <div class="flex items-center gap-2">
-
-                        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-900">
-
-                            <i class="ti ti-car text-sm text-white"></i>
-
-                        </div>
-
-                        <div>
-
-                            <p class="text-sm font-medium">
-                                Complete care
-                            </p>
-
-                            <p class="text-[11px] text-gray-400">
-                                Repair & maintenance
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
             </div>
 
 
@@ -229,49 +163,11 @@
 
                 <div class="relative overflow-hidden rounded-2xl bg-gray-950">
 
-                    {{-- Red accent --}}
-                    <div class="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-red-600/20"></div>
-
-                    <div class="absolute -bottom-24 -left-20 h-64 w-64 rounded-full bg-red-600/10"></div>
-
-
-                    <div class="relative flex min-h-[380px] items-center justify-center p-8">
-
-                        <div class="text-center">
-
-                            <div class="mx-auto flex h-30 w-30 items-center justify-center rounded-2xl shadow-lg">
-
-                                <img
-                                    src="{{ asset('images/logobsa.png') }}"
-                                    alt="BSA Auto Repair Shop Logo"
-                                    class="max-h-20 w-auto object-contain"
-                                >
-
-                            </div>
-
-
-                            <p class="mt-6 text-base font-medium text-white">
-                                BSA Auto Repair Shop
-                            </p>
-
-                            <p class="mt-1 text-xs text-gray-400">
-                                Repair · Maintenance · Service
-                            </p>
-
-
-                            <div class="mx-auto mt-6 flex items-center justify-center gap-2">
-
-                                <span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>
-
-                                <span class="text-[11px] uppercase tracking-[0.2em] text-gray-500">
-                                    Carmen, Davao del Norte
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                    </div>
+                    <img
+                        src="{{ asset('images/background.jpeg') }}"
+                        alt="BSA Auto Repair Shop"
+                        class="h-full w-full object-cover"
+                    >
 
                 </div>
 
@@ -284,8 +180,10 @@
                         <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-red-50">
 
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 0 1 2.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 0 0 .322-1.672V2.75a.75.75 0 0 1 .75-.75 2.25 2.25 0 0 1 2.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282m0 0h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 0 1-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 0 0-1.423-.23H5.904m10.598-9.75H14.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 0 1-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 0 0-1.302 4.665c0 1.194.232 2.333.654 3.375Z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75a4.5 4.5 0 0 1-4.884 4.484c-1.076-.091-2.264.071-2.95.904l-7.152 8.684a2.548 2.548 0 1 1-3.586-3.586l8.684-7.152c.833-.686.995-1.874.904-2.95a4.5 4.5 0 0 1 6.336-4.486l-3.276 3.276a3.004 3.004 0 0 0 2.25 2.25l3.276-3.276c.256.565.398 1.192.398 1.852Z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.867 19.125h.008v.008h-.008v-.008Z" />
                             </svg>
+
 
                         </div>
 
@@ -608,25 +506,9 @@
             <div class="relative overflow-hidden rounded-2xl bg-gray-950 px-6 py-12 text-white sm:px-10 lg:px-14">
 
 
-                {{-- Red decorative shape --}}
-                <div class="absolute -right-20 -top-32 h-80 w-80 rounded-full bg-red-600/20"></div>
-
-                <div class="absolute -bottom-40 left-1/3 h-72 w-72 rounded-full bg-red-600/10"></div>
-
-
                 <div class="relative flex flex-col items-start justify-between gap-8 md:flex-row md:items-center">
 
                     <div class="max-w-xl">
-
-                        <div class="flex items-center gap-2">
-
-                            <span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>
-
-                            <p class="text-xs font-medium uppercase tracking-wider text-red-400">
-                                BSA Job Order Management System
-                            </p>
-
-                        </div>
 
 
                         <h2 class="mt-3 text-2xl font-semibold sm:text-3xl">
