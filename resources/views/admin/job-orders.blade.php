@@ -364,6 +364,16 @@
                                         x-cloak
                                     >
 
+                                    @php
+                                        $modalStatusClass = $statusStyles[$job->status]
+                                            ?? 'bg-gray-100 text-gray-700 ring-1 ring-inset ring-gray-200';
+
+                                        $modalStatusIcon = $statusIcons[$job->status]
+                                            ?? 'ti-help-circle';
+                                    @endphp
+
+
+
                                         <div class="flex items-center gap-3">
 
                                             <h2 class="text-lg font-semibold text-gray-900">
@@ -371,13 +381,11 @@
                                             </h2>
 
                                             <span
-                                                class="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium ring-1 ring-inset {{ $statusClass }}"
+                                                class="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium ring-1 ring-inset {{ $modalStatusClass }}"
                                             >
-
-                                                <i class="ti {{ $statusIcon }}"></i>
+                                                <i class="ti {{ $modalStatusIcon }}"></i>
 
                                                 {{ str_replace('_', ' ', ucwords($job->status)) }}
-
                                             </span>
 
                                         </div>
@@ -403,6 +411,8 @@
                                 <i class="ti ti-x text-xl"></i>
 
                             </button>
+
+                            
 
                         </div>
 
@@ -915,19 +925,33 @@
                         </div>
 
 
-                        {{-- ================================================= --}}
                         {{-- MODAL FOOTER --}}
-                        {{-- ================================================= --}}
 
-                        <div class="flex justify-end border-t border-gray-100 px-6 py-4">
+                        <div class="flex justify-end gap-2 border-t border-gray-100 px-6 py-4">
 
+                            {{-- Close --}}
                             <button
                                 type="button"
                                 @click="viewOpen = false"
-                                class="rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                                class="rounded-lg border border-gray-200
+                                    px-4 py-2.5 text-sm font-medium
+                                    text-gray-700 transition hover:bg-gray-50"
                             >
                                 Close
                             </button>
+
+                            {{-- Print --}}
+                            <button
+                                type="button"
+                                onclick="window.print()"
+                                class="inline-flex items-center gap-2 rounded-lg
+                                    bg-black px-4 py-2.5 text-sm font-medium
+                                    text-white transition hover:bg-gray-800"
+                            >
+                                <i class="ti ti-printer"></i>
+                                Download PDF to Print
+                            </button>
+                            
 
                         </div>
 

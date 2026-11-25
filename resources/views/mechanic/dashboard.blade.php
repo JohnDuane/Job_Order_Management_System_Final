@@ -1,6 +1,6 @@
 <x-app-layout>
 
-    <div class="min-h-screen bg-white text-gray-900">
+    <div class="min-h-screen text-gray-900">
 
         <div class="min-h-screen md:flex">
 
@@ -11,10 +11,7 @@
             {{-- Main Content --}}
             <main class="flex-1 min-w-0 p-6 sm:p-8">
 
-                {{-- ================================================= --}}
                 {{-- HEADER --}}
-                {{-- ================================================= --}}
-
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
 
                     <div>

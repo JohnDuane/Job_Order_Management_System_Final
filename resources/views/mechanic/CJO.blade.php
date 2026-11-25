@@ -1,7 +1,7 @@
 <x-app-layout>
 
     <div
-        class="min-h-screen bg-white text-gray-900"
+        class="min-h-screen text-gray-900"
         x-data="{
             showConfirmModal: false,
             isSubmitting: false
@@ -72,10 +72,6 @@
 
 
                     {{-- Customer and Vehicle --}}
-                    {{-- ========================================================= --}}
-                    {{-- CUSTOMER AND VEHICLE --}}
-                    {{-- ========================================================= --}}
-
                     <div
                         class="bg-white border border-gray-200 rounded-xl p-5"
                         x-data="{
@@ -180,10 +176,7 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
 
-                            {{-- ================================================= --}}
                             {{-- CUSTOMER --}}
-                            {{-- ================================================= --}}
-
                             <div class="relative">
 
                                 <label class="block text-sm font-medium mb-1.5">
@@ -326,10 +319,7 @@
                             </div>
 
 
-                            {{-- ================================================= --}}
                             {{-- VEHICLE --}}
-                            {{-- ================================================= --}}
-
                             <div class="relative">
 
                                 <label class="block text-sm font-medium mb-1.5">
@@ -626,10 +616,7 @@
         </div>
 
 
-        {{-- ========================================================= --}}
         {{-- CONFIRMATION MODAL --}}
-        {{-- ========================================================= --}}
-
         <div
             x-show="showConfirmModal"
             x-cloak

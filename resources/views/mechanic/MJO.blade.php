@@ -1,6 +1,6 @@
 <x-app-layout>
 
-    <div class="min-h-screen bg-white text-gray-900">
+    <div class="min-h-screen text-gray-900">
 
         <div class="min-h-screen md:flex">
 
@@ -11,10 +11,7 @@
             {{-- Main Content --}}
             <main class="min-w-0 flex-1 flex-col gap-6 p-4 sm:p-6 lg:p-8">
 
-                {{--========================================================= --}}
                 {{--HEADER --}}
-                {{--========================================================= --}}
-
                 <div class="flex items-start justify-between mb-6">
 
                     <div>
@@ -44,10 +41,7 @@
                 </div>
 
 
-                {{-- ========================================================= --}}
                 {{-- SEARCH & FILTER --}}
-                {{-- ========================================================= --}}
-
                 <form
                     method="GET"
                     class="mb-5 flex flex-col gap-2 sm:flex-row"
@@ -112,22 +106,17 @@
                 </form>
 
 
-                {{-- ========================================================= --}}
                 {{-- JOB ORDERS --}}
-                {{-- ========================================================= --}}
-
                 <div class="space-y-3">
 
                     @forelse($jobs as $job)
 
-                        {{-- ================================================= --}}
                         {{-- JOB ORDER CARD --}}
-                        {{-- ================================================= --}}
-
                         <div
                             x-data="{
                                 viewOpen: false,
-                                startOpen: false
+                                startOpen: false,
+                                completeOpen: false
                             }"
                             class="rounded-xl border border-gray-200
                                 bg-white p-5
@@ -474,30 +463,160 @@
 
                                     @elseif($job->status === 'in_progress')
 
-                                        <form
-                                            method="POST"
-                                            action="{{ route('mechanic.job-orders.complete', $job) }}"
+                                        {{-- Complete --}}
+                                        <button
+                                            type="button"
+                                            @click="completeOpen = true"
+                                            class="inline-flex items-center gap-1.5
+                                                rounded-lg bg-green-600
+                                                px-3 py-2 text-sm
+                                                font-medium text-white
+                                                transition hover:bg-green-700"
+                                        >
+                                            <i class="ti ti-circle-check"></i>
+                                            Complete
+                                        </button>
+
+                                        {{-- ========================================= --}}
+                                        {{-- COMPLETE JOB ORDER CONFIRMATION MODAL --}}
+                                        {{-- ========================================= --}}
+
+                                        <div
+                                            x-show="completeOpen"
+                                            x-cloak
+                                            x-transition.opacity
+                                            @keydown.escape.window="completeOpen = false"
+                                            class="fixed inset-0 z-[70] flex items-center
+                                                justify-center bg-black/50 px-4 py-6"
+                                        >
+                                            <div
+                                                x-show="completeOpen"
+                                                x-transition
+                                                @click.outside="completeOpen = false"
+                                                class="w-full max-w-md rounded-2xl bg-white shadow-2xl"
+                                            >
+                                                {{-- Modal Header --}}
+                                                <div class="px-6 pt-6">
+                                                    <div class="flex items-start gap-4">
+
+                                                        <div
+                                                            class="flex h-11 w-11 shrink-0
+                                                                items-center justify-center
+                                                                rounded-full bg-green-100"
+                                                        >
+                                                            <i class="ti ti-circle-check text-xl text-green-600"></i>
+                                                        </div>
+
+                                                        <div class="min-w-0">
+                                                            <h2 class="text-lg font-semibold text-gray-900">
+                                                                Complete job order?
+                                                            </h2>
+
+                                                            <p class="mt-1 text-sm leading-5 text-gray-500">
+                                                                Are you sure you want to mark
+                                                                <span class="font-medium text-gray-700">
+                                                                    {{ $job->code }}
+                                                                </span>
+                                                                as completed?
+                                                            </p>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                                {{-- Modal Body --}}
+                                                <div class="px-6 py-5">
+                                                    <div class="rounded-xl border border-gray-200
+                                                                bg-gray-50 px-4 py-3">
+
+                                                        <p class="text-xs text-gray-400">
+                                                            Customer
+                                                        </p>
+
+                                                        <p class="mt-1 text-sm font-medium text-gray-900">
+                                                            {{ $job->customer->first_name }}
+                                                            {{ $job->customer->last_name }}
+                                                        </p>
+
+                                                        <p class="mt-2 text-xs text-gray-400">
+                                                            Vehicle
+                                                        </p>
+
+                                                        <p class="mt-1 text-sm text-gray-700">
+                                                            {{ $job->vehicle->make }}
+
+                                                            @if ($job->vehicle->model)
+                                                                {{ $job->vehicle->model }}
+                                                            @endif
+
+                                                            ·
+                                                            {{ $job->vehicle->plate_number }}
+                                                        </p>
+                                                    </div>
+
+                                                    <p class="mt-4 text-sm leading-6 text-gray-500">
+                                                        Once completed, this job order will be marked as
+                                                        <span class="font-medium text-green-700">
+                                                            Completed
+                                                        </span>.
+                                                    </p>
+                                                </div>
+
+                                                {{-- Modal Footer --}}
+                                                <div
+                                                    class="flex items-center justify-end gap-2
+                                                        border-t border-gray-100 px-6 py-4"
+                                                >
+                                                    <button
+                                                        type="button"
+                                                        @click="completeOpen = false"
+                                                        class="rounded-lg border border-gray-200
+                                                            px-4 py-2.5 text-sm font-medium
+                                                            text-gray-700 transition hover:bg-gray-50"
+                                                    >
+                                                        Cancel
+                                                    </button>
+
+                                                    <form
+                                                        method="POST"
+                                                        action="{{ route('mechanic.job-orders.complete', $job) }}"
+                                                    >
+                                                        @csrf
+
+                                                        <button
+                                                            type="submit"
+                                                            class="inline-flex items-center gap-2
+                                                                rounded-lg bg-green-600
+                                                                px-4 py-2.5 text-sm
+                                                                font-medium text-white
+                                                                transition hover:bg-green-700"
+                                                        >
+                                                            <i class="ti ti-circle-check"></i>
+                                                            Complete job order
+                                                        </button>
+                                                    </form>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+
+                                    @elseif($job->status === 'needs_revision')
+
+                                        <a
+                                            href="{{ route('mechanic.job-orders.edit', $job) }}"
+                                            class="inline-flex items-center gap-1.5
+                                                   rounded-lg bg-gray-900
+                                                   px-3 py-2 text-sm
+                                                   font-medium text-white
+                                                   transition hover:bg-gray-800"
                                         >
 
-                                            @csrf
+                                            <i class="ti ti-edit"></i>
 
-                                            <button
-                                                type="submit"
-                                                class="inline-flex items-center gap-1.5
-                                                       rounded-lg bg-green-600
-                                                       px-3 py-2 text-sm
-                                                       font-medium text-white
-                                                       transition hover:bg-green-700"
-                                                onclick="return confirm('Mark this job order as completed?')"
-                                            >
+                                            Revise Job Order
 
-                                                <i class="ti ti-circle-check"></i>
-
-                                                Complete
-
-                                            </button>
-
-                                        </form>
+                                        </a>
 
                                     @endif
 

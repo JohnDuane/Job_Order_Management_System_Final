@@ -1,6 +1,6 @@
 <x-app-layout>
 
-    <div class="min-h-screen bg-white text-gray-900">
+    <div class="min-h-screen text-gray-900">
 
         <div class="min-h-screen md:flex">
 

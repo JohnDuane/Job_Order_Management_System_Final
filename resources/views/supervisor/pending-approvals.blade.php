@@ -263,21 +263,27 @@
                                                 {{-- Body --}}
                                                 <div class="px-6 py-5">
 
-                                                    <div class="flex gap-3 rounded-xl bg-green-50 p-4">
+                                                    <div class="flex gap-3 rounded-xl bg-gray-50 p-4">
 
                                                         <div
                                                             class="flex h-10 w-10 shrink-0 items-center justify-center
-                                                                rounded-full bg-green-100"
+                                                                rounded-full bg-gray-100"
                                                         >
-                                                            <i class="ti ti-check text-xl text-green-600"></i>
+                                                            <i class="ti ti-check text-xl text-gray-600"></i>
+
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                </svg>
+
+
                                                         </div>
 
                                                         <div>
-                                                            <p class="text-sm font-medium text-green-800">
+                                                            <p class="text-sm font-medium text-gray-800">
                                                                 Ready for approval
                                                             </p>
 
-                                                            <p class="mt-1 text-sm leading-5 text-green-700">
+                                                            <p class="mt-1 text-sm leading-5 text-gray-700">
                                                                 Approving this job order will allow it to be assigned
                                                                 to a mechanic.
                                                             </p>
